@@ -1,12 +1,17 @@
 # tokenwise 🚀
 
+![npm version](https://img.shields.io/npm/v/tokenwise)
+![downloads](https://img.shields.io/npm/dw/tokenwise)
+![license](https://img.shields.io/github/license/sohqureshi/tokenwise)
+![stars](https://img.shields.io/github/stars/sohqureshi/tokenwise?style=social)
+
 > Stop sending raw JSON to LLMs. Optimize first. Save tokens. Save money.
 
 ---
 
 ## 🧠 What is tokenwise?
 
-**tokenwise** is a lightweight utility to optimize your data before sending it to AI models.
+**tokenwise** is a lightweight utility that optimizes your data before sending it to AI models.
 
 Raw JSON is:
 
@@ -72,6 +77,7 @@ const result = ai(data)
   .value();
 
 console.log(result);
+// Output: [Ali,11];[John,12]
 ```
 
 ---
@@ -106,7 +112,15 @@ tokenwise helps reduce token usage by **30–60%** by:
 * Prompt optimization
 * API cost reduction
 * Data preprocessing for LLMs
-* LangChain / AI pipelines
+* LLM pipelines and workflows
+
+---
+
+## 🎥 Demo
+
+```bash
+node demo.js
+```
 
 ---
 
@@ -124,6 +138,12 @@ tokenwise helps reduce token usage by **30–60%** by:
 Contributions are welcome!
 
 Feel free to open issues or submit PRs.
+
+---
+
+## 📄 License
+
+MIT License
 
 ---
 
