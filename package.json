@@ -1,0 +1,14 @@
+{
+  "name": "tokenwise",
+  "version": "1.0.0",
+  "description": "Optimize JSON data for AI by reducing token usage",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}
