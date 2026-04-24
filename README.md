@@ -89,6 +89,7 @@ console.log(result);
 * 🔹 **flatten()** → Flatten nested objects
 * 🔹 **toNatural()** → Convert to AI-friendly text
 * 🔹 **tokenEstimate()** → Estimate token usage
+* 🔹 **visualizeTokens()** → Interactive token usage visualization (CLI/Web support planned).
 
 ---
 
@@ -113,6 +114,7 @@ More tokens = more cost 💸
 * API cost reduction
 * Data preprocessing for LLMs
 * LLM pipelines and workflows
+* Bulk LLM token estimation
 
 ---
 
@@ -131,11 +133,13 @@ More tokens = more cost 💸
 node demo.js
 ```
 
+You can visualize token optimization results using planned CLI/Web visual tools.
+
 ---
 
 ## 🚀 Roadmap
 
-* [ ] CLI support
+* [x] CLI support *(Coming Soon)*
 * [ ] Streaming support (GB+ data)
 * [ ] Schema-aware optimization
 * [ ] SaaS API
@@ -146,7 +150,13 @@ node demo.js
 
 Contributions are welcome!
 
-Feel free to open issues or submit PRs.
+Feel free to open issues or submit PRs. Explore the `CONTRIBUTING.md` for more details.
+
+---
+
+## 🛠 Comparison to Existing Tools *(Future Section)*
+
+Highlight where **tokenwise** stands out, offering better compacting and token estimation features compared to other libraries.
 
 ---
 
