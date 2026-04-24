@@ -1,5 +1,7 @@
 import { prune } from "./core/prune";
 import { compact } from "./core/compact";
+import { toTOON } from "./core/toon";
+import { analyze } from "./core/analyze";
 
 export class AIChain {
   private data: any;
@@ -16,6 +18,15 @@ export class AIChain {
   compact() {
     this.data = compact(this.data);
     return this;
+  }
+
+  toTOON() {
+    this.data = toTOON(this.data);
+    return this;
+  }
+
+  analyze() {
+    return analyze(this.data);
   }
 
   value() {
