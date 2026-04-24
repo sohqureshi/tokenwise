@@ -19,7 +19,7 @@ Raw JSON is:
 * ❌ token-heavy
 * ❌ expensive for LLMs
 
-tokenwise helps you:
+**tokenwise** helps you:
 
 * 📉 reduce token usage
 * ⚡ improve response speed
@@ -98,7 +98,7 @@ LLMs charge per token.
 
 More tokens = more cost 💸
 
-tokenwise helps reduce token usage by **30–60%** by:
+**tokenwise** helps reduce token usage by **30–60%** by:
 
 * removing redundant data
 * simplifying structure
@@ -115,6 +115,7 @@ tokenwise helps reduce token usage by **30–60%** by:
 * LLM pipelines and workflows
 
 ---
+
 ## ⚡ Token Savings
 
 - **JSON Tokens:** 169  
@@ -123,6 +124,7 @@ tokenwise helps reduce token usage by **30–60%** by:
 👉 **Saved:** 49%
 
 ---
+
 ## 🎥 Demo
 
 ```bash
