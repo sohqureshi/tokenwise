@@ -115,7 +115,14 @@ tokenwise helps reduce token usage by **30–60%** by:
 * LLM pipelines and workflows
 
 ---
+## ⚡ Token Savings
 
+- **JSON Tokens:** 169  
+- **TOON Tokens:** 86  
+
+👉 **Saved:** 49%
+
+---
 ## 🎥 Demo
 
 ```bash
