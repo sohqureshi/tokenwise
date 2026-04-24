@@ -1,17 +1,17 @@
-import { toTOON } from "./toon";
+import { estimateTokens } from "./token";
 
 export function analyze(data: any) {
   const json = JSON.stringify(data);
   const toon = toTOON(data);
 
-  const jsonSize = json.length;
-  const toonSize = toon.length;
+  const jsonTokens = estimateTokens(json);
+  const toonTokens = estimateTokens(toon);
 
-  const savings = Math.round((1 - toonSize / jsonSize) * 100);
+  const savings = Math.round((1 - toonTokens / jsonTokens) * 100);
 
   return {
-    jsonSize,
-    toonSize,
+    jsonTokens,
+    toonTokens,
     savings: `${savings}%`,
   };
 }
