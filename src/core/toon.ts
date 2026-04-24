@@ -1,10 +1,33 @@
+/**
+ * Converts JSON into TOON-like (Token-Oriented Object Notation) format.
+ *
+ * Goal:
+ * - Remove repeated keys
+ * - Represent arrays as table-like structure
+ * - Reduce token usage for LLMs
+ *
+ * @param data - Input JSON
+ * @param indent - Internal indentation level
+ * @returns Token-efficient string format
+ *
+ * Example:
+ * Input:
+ * {
+ *   users: [{ id: 1, name: "Ali" }]
+ * }
+ *
+ * Output:
+ * users[1]{id,name}:
+ * 1,Ali
+ */
 export function toTOON(data: any, indent = 0): string {
   const space = "  ".repeat(indent);
 
+  // Handle arrays
   if (Array.isArray(data)) {
     if (data.length === 0) return "[]";
 
-    // Check if uniform objects
+    // Extract schema from first object
     if (typeof data[0] === "object") {
       const keys = Object.keys(data[0]);
 
@@ -21,9 +44,11 @@ export function toTOON(data: any, indent = 0): string {
       return result;
     }
 
+    // Primitive array
     return `${space}[${data.length}]: ${data.join(",")}`;
   }
 
+  // Handle objects
   if (typeof data === "object" && data !== null) {
     let result = "";
 
@@ -43,6 +68,9 @@ export function toTOON(data: any, indent = 0): string {
   return formatValue(data);
 }
 
+/**
+ * Formats values for TOON output.
+ */
 function formatValue(val: any): string {
   if (val === null || val === undefined) return "";
   if (typeof val === "string") return val;
