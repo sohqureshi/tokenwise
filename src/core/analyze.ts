@@ -16,18 +16,25 @@ import { estimateTokens } from "./token";
  * analyze(data)
  * → { jsonTokens: 120, toonTokens: 70, savings: "42%" }
  */
-export function analyze(data: any) {
-  const json = JSON.stringify(data);
-  const toon = toTOON(data);
+import { toon } from './toon'
 
-  const jsonTokens = estimateTokens(json);
-  const toonTokens = estimateTokens(toon);
+function countTokens(input: any): number {
+  const str = typeof input === 'string' ? input : JSON.stringify(input)
+  return str.split(/\s+/).length
+}
 
-  const savings = Math.round((1 - toonTokens / jsonTokens) * 100);
+export function analyze(input: any) {
+  const original = JSON.stringify(input)
+  const optimized = toon(input)
+
+  const originalTokens = countTokens(original)
+  const optimizedTokens = countTokens(optimized)
+
+  const savings = originalTokens - optimizedTokens
 
   return {
-    jsonTokens,
-    toonTokens,
-    savings: `${savings}%`,
-  };
+    originalTokens,
+    optimizedTokens,
+    savings
+  }
 }
