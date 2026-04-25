@@ -2,6 +2,7 @@ import { prune } from './core/prune'
 import { flatten } from './core/flatten'
 import { compact } from './core/compact'
 import { analyze } from './core/analyze'
+import { toToon } from './core/toon'
 
 
 export class AIChain {
