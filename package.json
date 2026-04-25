@@ -4,21 +4,17 @@
   "description": "Optimize JSON data for AI by reducing token usage",
   "main": "dist/index.js",
   "type": "module",
-
   "bin": {
     "tokenwise": "./dist/cli.js"
   },
-
   "files": [
     "dist"
   ],
-
   "scripts": {
     "build": "tsup src/index.ts src/cli.ts --format esm,cjs --dts",
     "test": "vitest",
     "prepare": "npm run build"
   },
-
   "keywords": [
     "ai",
     "llm",
@@ -28,11 +24,10 @@
     "toon",
     "data-processing"
   ],
-
   "author": "Mohammad Sohail",
   "license": "MIT",
-
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
