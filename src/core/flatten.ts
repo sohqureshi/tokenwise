@@ -13,22 +13,24 @@
  * flatten({ user: { name: "Ali" } })
  * → ["user.name=Ali"]
  */
-export function flatten(obj: any, prefix = ""): string[] {
-  let result: string[] = [];
+export function flatten(obj: any, prefix = '', res: any = {}) {
+  if (obj === null || obj === undefined) return res
 
-  for (let key in obj) {
-    const value = obj[key];
+  if (typeof obj !== 'object') {
+    res[prefix] = obj
+    return res
+  }
 
-    // Create nested key path
-    const newKey = prefix ? `${prefix}.${key}` : key;
+  for (const key in obj) {
+    const value = obj[key]
+    const newKey = prefix ? `${prefix}.${key}` : key
 
-    if (typeof value === "object" && value !== null) {
-      // Recursively flatten nested objects
-      result.push(...flatten(value, newKey));
+    if (typeof value === 'object' && value !== null) {
+      flatten(value, newKey, res)
     } else {
-      result.push(`${newKey}=${value}`);
+      res[newKey] = value
     }
   }
 
-  return result;
+  return res
 }
