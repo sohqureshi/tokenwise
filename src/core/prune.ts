@@ -1,30 +1,62 @@
-export function prune(obj: any): any {
-  if (obj === null || obj === undefined) return undefined
+type PruneOptions = {
+  removeKeys?: string[];
+  removeNull?: boolean;
+  removeUndefined?: boolean;
+  removeEmptyObjects?: boolean;
+  removeEmptyArrays?: boolean;
+};
 
+export function prune(
+  obj: any,
+  options: PruneOptions = {}
+): any {
+  const {
+    removeKeys = [],
+    removeNull = true,
+    removeUndefined = true,
+    removeEmptyObjects = true,
+    removeEmptyArrays = false,
+  } = options;
+
+  // Primitive values → return as is
+  if (obj === null) return removeNull ? undefined : obj;
+  if (obj === undefined) return removeUndefined ? undefined : obj;
+  if (typeof obj !== "object") return obj;
+
+  // Array handling
   if (Array.isArray(obj)) {
-    return obj
-      .map(prune)
-      .filter((v) => v !== undefined)
-  }
+    const arr = obj
+      .map((item) => prune(item, options))
+      .filter((item) => item !== undefined);
 
-  if (typeof obj !== 'object') return obj
-
-  const res: any = {}
-
-  for (const k in obj) {
-    const value = prune(obj[k])
-
-    if (
-      value === undefined ||
-      (typeof value === 'object' &&
-        !Array.isArray(value) &&
-        Object.keys(value).length === 0)
-    ) {
-      continue
+    if (removeEmptyArrays && arr.length === 0) {
+      return undefined;
     }
 
-    res[k] = value
+    return arr;
   }
 
-  return res
+  // Object handling
+  const result: any = {};
+
+  for (const key in obj) {
+    if (removeKeys.includes(key)) continue;
+
+    const value = prune(obj[key], options);
+
+    if (value === undefined) continue;
+
+    if (
+      removeEmptyObjects &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      Object.keys(value).length === 0
+    ) {
+      continue;
+    }
+
+    result[key] = value;
+  }
+
+  return result;
 }
