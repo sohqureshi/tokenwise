@@ -2,21 +2,23 @@
 // Tokenwise - Public Entry Point
 // ===============================
 
-import { AIChain } from './chain'
-// -------- Core APIs --------
-export { prune } from './core/prune'
-export { compact } from './core/compact'
-export { flatten } from './core/flatten'
-export { analyze } from './core/analyze'
-export { toTOON } from './core/toon'
-export { AIChain }
+import { AIChain } from "./chain";
+import { prune } from "./core/prune";
+import { compact } from "./core/compact";
+import { toTOON } from "./core/toon";
+import { analyze } from "./core/analyze";
 
-// ✅ default export
-export default {
-  AIChain,
-  prune,
-  compact,
-  flatten,
-  analyze,
-  toTOON
+// callable function (main entry)
+function ai(data: any) {
+  return new AIChain(data);
 }
+
+// attach utilities (optional but powerful)
+ai.prune = prune;
+ai.compact = compact;
+ai.toTOON = toTOON;
+ai.analyze = analyze;
+ai.AIChain = AIChain;
+
+export default ai;
+export { AIChain, prune, compact, toTOON, analyze };
