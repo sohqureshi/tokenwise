@@ -1,5 +1,5 @@
 {
-  "name": "tokenwise",
+  "name": "@sohqureshi/tokenwise",
   "version": "1.0.0",
   "description": "Optimize JSON data for AI by reducing token usage",
   "main": "dist/index.js",
