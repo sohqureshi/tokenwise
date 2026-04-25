@@ -1,35 +1,49 @@
-import { prune } from "./core/prune";
-import { compact } from "./core/compact";
-import { toTOON } from "./core/toon";
-import { analyze } from "./core/analyze";
+import { prune } from './core/prune'
+import { flatten } from './core/flatten'
+import { compact } from './core/compact'
+import { analyze } from './core/analyze'
 
-export class AIChain {
-  private data: any;
+export function chain(input: any) {
+  let data = input
 
-  constructor(data: any) {
-    this.data = data;
-  }
+  return {
+    /**
+     * Remove null, undefined, and empty values
+     */
+    prune() {
+      data = prune(data)
+      return this
+    },
 
-  prune(keys: string[]) {
-    this.data = prune(this.data, keys);
-    return this;
-  }
+    /**
+     * Flatten nested objects into dot notation
+     */
+    flatten() {
+      data = flatten(data)
+      return this
+    },
 
-  compact() {
-    this.data = compact(this.data);
-    return this;
-  }
+    /**
+     * Compact JSON into minimal string
+     */
+    compact() {
+      data = compact(data)
+      return this
+    },
 
-  toTOON() {
-    this.data = toTOON(this.data);
-    return this;
-  }
+    /**
+     * Analyze token usage
+     */
+    analyze() {
+      return analyze(data)
+    },
 
-  analyze() {
-    return analyze(this.data);
-  }
-
-  value() {
-    return this.data;
+    /**
+     * Get final value
+     */
+    value() {
+      return data
+    }
   }
 }
+
