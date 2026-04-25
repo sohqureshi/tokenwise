@@ -67,7 +67,18 @@ bash npm run test
 
 # 🧩 Project Structure
 
-bash src/ │── core/                # Core transformations │   ├── prune.ts         # Remove unwanted keys │   ├── compact.ts       # Compact JSON structure │   ├── flatten.ts       # Flatten nested objects │   ├── toon.ts          # TOON format conversion │   ├── analyze.ts       # Token/size analysis │   ├── token.ts         # Token estimation logic │ │── chain.ts             # Fluent API (method chaining) │── index.ts             # Entry point (public API) │── cli.ts               # CLI tool 
+src/
+│── core/                # Core transformations
+│   ├── prune.ts         # Remove unwanted keys
+│   ├── compact.ts       # Compact JSON structure
+│   ├── flatten.ts       # Flatten nested objects
+│   ├── toon.ts          # TOON format conversion
+│   ├── analyze.ts       # Token/size analysis
+│   ├── token.ts         # Token estimation logic
+│
+│── chain.ts             # Fluent API (method chaining)
+│── index.ts             # Entry point (public API)
+│── cli.ts               # CLI tool
 
 > Note: The structure may evolve as new features are added.
 
