@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toTOON } from './src/core/toon'
+import { toTOON } from '../core/toon'
 
 describe('toTOON', () => {
 
@@ -87,7 +87,7 @@ describe('toTOON', () => {
 
     const output = toTOON(input)
 
-    // depends on your logic (adjust if needed)
+    // adjust based on your prune/handling logic
     expect(output).not.toContain('undefined')
   })
 
