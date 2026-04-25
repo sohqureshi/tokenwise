@@ -11,7 +11,7 @@ Tokenwise is an AI data optimization library that helps:
 
 - Reduce token usage for LLMs  
 - Transform JSON into efficient formats (TOON, compact)  
-- Process large datasets (streaming support)
+- Improve AI processing efficiency  
 
 ---
 
@@ -22,7 +22,7 @@ You can contribute in multiple ways:
 ### 💡 Feature Improvements
 - Add new transformation methods (e.g., normalize, dedupe)
 - Improve TOON format efficiency
-- Enhance streaming performance
+- Enhance CLI capabilities
 
 ### 🐛 Bug Fixes
 - Fix incorrect transformations
@@ -34,9 +34,8 @@ You can contribute in multiple ways:
 - Improve code comments
 
 ### ⚡ Performance
-- Optimize for large datasets (GB/TB scale)
+- Optimize transformation logic
 - Improve memory efficiency
-- Add streaming enhancements
 
 ---
 
@@ -54,15 +53,23 @@ bash npm install
 
 ---
 
-## 3. Run the project
+## 3. Build the project
 
-bash npm run build npm run test 
+bash npm run build 
+
+---
+
+## 4. Run tests
+
+bash npm run test 
 
 ---
 
 # 🧩 Project Structure
 
-bash src/ │── core/        # Core transformations (prune, compact, toon, etc.) │── stream/      # Streaming support (large data processing) │── chain.ts     # Fluent API │── index.ts     # Entry point │── cli.ts       # CLI tool 
+bash src/ │── core/                # Core transformations │   ├── prune.ts         # Remove unwanted keys │   ├── compact.ts       # Compact JSON structure │   ├── flatten.ts       # Flatten nested objects │   ├── toon.ts          # TOON format conversion │   ├── analyze.ts       # Token/size analysis │   ├── token.ts         # Token estimation logic │ │── chain.ts             # Fluent API (method chaining) │── index.ts             # Entry point (public API) │── cli.ts               # CLI tool 
+
+> Note: The structure may evolve as new features are added.
 
 ---
 
@@ -72,9 +79,11 @@ We use Vitest for testing.
 
 bash npm run test 
 
-👉 Please ensure:
-- All tests pass  
-- New features include tests  
+### ✅ Guidelines
+
+- Ensure all tests pass  
+- Add tests for new features  
+- Cover edge cases  
 
 ---
 
@@ -89,12 +98,10 @@ bash npm run test
 
 ---
 
-### 🧠 Naming
+### 🧠 Naming Conventions
 
 - Use meaningful names  
 - Prefer clarity over short names  
-
-Example:
 
 ts // ✅ Good estimateTokens()  // ❌ Avoid estTok() 
 
@@ -104,9 +111,9 @@ ts // ✅ Good estimateTokens()  // ❌ Avoid estTok()
 
 Tokenwise is performance-focused:
 
-- Avoid loading full datasets in memory  
-- Prefer streaming where possible  
-- Optimize for large-scale data  
+- Avoid unnecessary object copies  
+- Optimize transformations  
+- Keep logic lightweight  
 
 ---
 
@@ -121,7 +128,7 @@ bash git checkout -b feature/your-feature-name
 4. Add tests (if applicable)  
 5. Commit changes  
 
-bash git commit -m "feat: add streaming optimization" 
+bash git commit -m "feat: add new optimization method" 
 
 6. Push to your fork  
 
@@ -157,10 +164,10 @@ Before creating an issue:
 
 We especially welcome contributions in:
 
-- Streaming pipeline improvements  
-- Token optimization algorithms  
+- Token optimization improvements  
 - CLI enhancements  
-- Large dataset handling  
+- Transformation accuracy  
+- Performance optimizations  
 
 ---
 
@@ -191,4 +198,4 @@ If you’re unsure, open an issue first—we’ll guide you 👍
 ---
 
 Happy coding 🚀  
-**– Mohammad Sohai Qureshi
+**– Mohammad Sohai
