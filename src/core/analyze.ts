@@ -16,7 +16,6 @@ import { estimateTokens } from "./token";
  * analyze(data)
  * → { jsonTokens: 120, toonTokens: 70, savings: "42%" }
  */
-import { toon } from './toon'
 
 function countTokens(input: any): number {
   const str = typeof input === 'string' ? input : JSON.stringify(input)
