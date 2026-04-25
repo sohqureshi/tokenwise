@@ -3,47 +3,34 @@ import { flatten } from './core/flatten'
 import { compact } from './core/compact'
 import { analyze } from './core/analyze'
 
-export function chain(input: any) {
-  let data = input
 
-  return {
-    /**
-     * Remove null, undefined, and empty values
-     */
-    prune() {
-      data = prune(data)
-      return this
-    },
+export class AIChain {
+  private data: any;
 
-    /**
-     * Flatten nested objects into dot notation
-     */
-    flatten() {
-      data = flatten(data)
-      return this
-    },
+  constructor(data: any) {
+    this.data = data;
+  }
 
-    /**
-     * Compact JSON into minimal string
-     */
-    compact() {
-      data = compact(data)
-      return this
-    },
+  prune(options?: any) {
+    this.data = prune(this.data, options);
+    return this;
+  }
 
-    /**
-     * Analyze token usage
-     */
-    analyze() {
-      return analyze(data)
-    },
+  compact() {
+    this.data = compact(this.data);
+    return this;
+  }
 
-    /**
-     * Get final value
-     */
-    value() {
-      return data
-    }
+  toTOON() {
+    this.data = toTOON(this.data);
+    return this;
+  }
+
+  analyze() {
+    return analyze(this.data);
+  }
+
+  value() {
+    return this.data;
   }
 }
-
