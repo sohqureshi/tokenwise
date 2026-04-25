@@ -118,7 +118,8 @@ bash npm run test
 - Use meaningful names  
 - Prefer clarity over short names  
 
-ts // ✅ Good estimateTokens()  // ❌ Avoid estTok() 
+ts // ✅ Good estimateTokens() 
+   // ❌ Avoid estTok() 
 
 ---
 
