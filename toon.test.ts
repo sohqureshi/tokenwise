@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toTOON } from './src/core/toon' // ✅ FIXED PATH
+import { toTOON } from './src/core/toon'
 
 describe('toTOON', () => {
   it('should convert simple JSON to TOON format', () => {
@@ -13,9 +13,10 @@ describe('toTOON', () => {
 
     const output = toTOON(input)
 
-    expect(output).toContain('context')
-    expect(output).toContain('task,Test task')
-    expect(output).toContain('items[3]')
+    expect(output).toContain('context:')
+    expect(output).toContain('task: Test task')
+    expect(output).toContain('location: Test location')
+    expect(output).toContain('[3]: 1,2,3')
   })
 
   it('should handle empty object', () => {
@@ -32,8 +33,7 @@ describe('toTOON', () => {
 
     const output = toTOON(input)
 
-    expect(output).toContain('nums[2]')
-    expect(output).toContain('10')
-    expect(output).toContain('20')
+    expect(output).toContain('nums:')
+    expect(output).toContain('[2]: 10,20')
   })
 })
