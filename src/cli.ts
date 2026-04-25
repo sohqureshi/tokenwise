@@ -12,10 +12,11 @@
  * --analyze    Show token analysis
  */
 
+#!/usr/bin/env node
 
 import fs from 'node:fs'
 import path from 'node:path'
-import ai from "./index";
+import { AIChain } from "./chain";
 
 // Get CLI args
 const args = process.argv.slice(2);
@@ -53,9 +54,10 @@ try {
   process.exit(1);
 }
 
-// Process options
-const tool = ai(json);
+// ✅ FIXED HERE
+const tool = new AIChain(json);
 
+// Process options
 if (args.includes("--toon")) {
   console.log(tool.toTOON().value());
 } else if (args.includes("--compact")) {
@@ -65,3 +67,4 @@ if (args.includes("--toon")) {
 } else {
   console.log("⚠️ No valid option provided. Use --toon, --compact or --analyze");
 }
+
