@@ -1,15 +1,15 @@
-export function compact(data: any): string {
-  if (!data) return "";
+import { prune } from './prune'
+import { flatten } from './flatten'
 
-  if (Array.isArray(data)) {
-    return data.map(item => compact(item)).join(";");
-  }
+export function compact(obj: any): string {
+  // Step 1: Remove null/undefined/empty
+  const pruned = prune(obj)
 
-  if (typeof data === "object") {
-    return Object.entries(data)
-      .map(([k, v]) => `${k}:${compact(v)}`)
-      .join(",");
-  }
+  // Step 2: Flatten structure
+  const flat = flatten(pruned)
 
-  return String(data);
+  // Step 3: Convert to compact string
+  return Object.entries(flat)
+    .map(([k, v]) => `${k}=${v}`)
+    .join('|')
 }
