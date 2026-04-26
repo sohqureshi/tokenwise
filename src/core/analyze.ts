@@ -24,7 +24,7 @@ function countTokens(input: any): number {
 
 export function analyze(input: any) {
   const original = JSON.stringify(input)
-  const optimized = toToon(input)
+  const optimized = toTOON(input)
 
   const originalTokens = countTokens(original)
   const optimizedTokens = countTokens(optimized)
