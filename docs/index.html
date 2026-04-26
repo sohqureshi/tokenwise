@@ -411,47 +411,127 @@ node cli/index.js optimize input.json
 
 
 <!-- EXAMPLE -->
+<!-- EXAMPLES -->
 <div class="section">
-  <h2>📉 Example Transformation</h2>
+  <h2>📉 Transform Examples</h2>
 
   <div class="grid">
 
+    <!-- PRUNE -->
     <div class="card">
-      <b style="color:#38bdf8;">Input (Verbose JSON)</b>
-      <pre style="margin-top:10px;">
-{
+      <b style="color:#38bdf8;">prune()</b>
+      <p style="margin:8px 0; color:#94a3b8;">Removes irrelevant or noisy fields</p>
+
+      <pre>{
   "user": {
+    "id": 1,
     "name": "John",
-    "preferences": {
-      "theme": "dark"
-    }
+    "debug": true,
+    "internal": "cache-data"
   }
-}
-      </pre>
+}</pre>
+
+      <hr style="margin:10px 0; border-color:#1e293b"/>
+
+      <pre>{
+  "user": {
+    "id": 1,
+    "name": "John"
+  }
+}</pre>
     </div>
 
+
+    <!-- COMPACT -->
     <div class="card">
-      <b style="color:#22c55e;">Output (Optimized)</b>
-      <pre style="margin-top:10px;">
-{
+      <b style="color:#a78bfa;">compact()</b>
+      <p style="margin:8px 0; color:#94a3b8;">Minimizes structure without changing meaning</p>
+
+      <pre>{
   "user": {
-    "name": "John",
-    "preferences": {
-      "theme": "dark"
+    "profile": {
+      "name": "John"
     }
   }
-}
-      </pre>
+}</pre>
 
-      <p style="margin-top:10px; font-size:13px; color:#94a3b8;">
-        Same meaning. Lower token footprint. Faster LLM processing.
-      </p>
+      <hr style="margin:10px 0; border-color:#1e293b"/>
+
+      <pre>{"user":{"profile":{"name":"John"}}}</pre>
+    </div>
+
+
+    <!-- FLATTEN -->
+    <div class="card">
+      <b style="color:#f59e0b;">flatten()</b>
+      <p style="margin:8px 0; color:#94a3b8;">Converts nested objects into key paths</p>
+
+      <pre>{
+  "user": {
+    "profile": {
+      "name": "John"
+    }
+  }
+}</pre>
+
+      <hr style="margin:10px 0; border-color:#1e293b"/>
+
+      <pre>{
+  "user.profile.name": "John"
+}</pre>
+    </div>
+
+
+    <!-- TONATURAL -->
+    <div class="card">
+      <b style="color:#22c55e;">toNatural()</b>
+      <p style="margin:8px 0; color:#94a3b8;">Converts JSON into LLM-friendly text</p>
+
+      <pre>{
+  "user": {
+    "name": "John",
+    "theme": "dark"
+  }
+}</pre>
+
+      <hr style="margin:10px 0; border-color:#1e293b"/>
+
+      <pre>User John prefers dark theme.</pre>
+    </div>
+
+
+    <!-- TOKEN ESTIMATE -->
+    <div class="card">
+      <b style="color:#ef4444;">tokenEstimate()</b>
+      <p style="margin:8px 0; color:#94a3b8;">Estimates token cost before sending to LLM</p>
+
+      <pre>{"text": "Hello world"}</pre>
+
+      <hr style="margin:10px 0; border-color:#1e293b"/>
+
+      <pre>~3–5 tokens</pre>
+    </div>
+
+
+    <!-- VISUALIZE -->
+    <div class="card">
+      <b style="color:#06b6d4;">visualizeTokens()</b>
+      <p style="margin:8px 0; color:#94a3b8;">Shows token distribution visually (CLI/Web planned)</p>
+
+      <pre>{
+  "prompt": "Explain AI"
+}</pre>
+
+      <hr style="margin:10px 0; border-color:#1e293b"/>
+
+      <pre>[███████░░░] 72% prompt
+[██░░░░░░░░] 28% system</pre>
     </div>
 
   </div>
 </div>
 
-  <!-- SUPPORT -->
+<!-- SUPPORT -->
   <div class="section">
     <h2>❤️ Support This Project</h2>
 
