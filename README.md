@@ -150,14 +150,6 @@ You can visualize token optimization results using planned CLI/Web visual tools.
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome!
-
-
-
----
-
 ## 🛠 Comparison to Existing Tools *(Future Section)*
 
 Highlight where **tokenwise** stands out, offering better compacting and token estimation features compared to other libraries.
@@ -188,7 +180,7 @@ TokenWise is built to help developers reduce LLM cost and improve efficiency.
 
 If it helps you, consider supporting its development:
 
-[![Sponsor](https://img.shields.io/badge/❤️%20GitHub%20Sponsors-View-red?style=for-the-badge&logo=github)](https://github.com/sponsors/sohqureshi)
+[![Support](https://img.shields.io/badge/❤️%20Support%20TokenWise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
 
 ---
 
