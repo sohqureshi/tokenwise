@@ -140,6 +140,7 @@ You can visualize token optimization results using planned CLI/Web visual tools.
 ## 🚀 Roadmap
 
 * [x] CLI support *(Coming Soon)*
+* [ ] NPM Support
 * [ ] Streaming support (GB+ data)
 * [ ] Schema-aware optimization
 * [ ] SaaS API
@@ -150,7 +151,7 @@ You can visualize token optimization results using planned CLI/Web visual tools.
 
 Contributions are welcome!
 
-Feel free to open issues or submit PRs. Explore the `CONTRIBUTING.md` for more details.
+
 
 ---
 
@@ -160,15 +161,31 @@ Highlight where **tokenwise** stands out, offering better compacting and token e
 
 ---
 
+## 🤝 Contributing
+
+PRs are welcome,Feel free to open issues or submit PRs, Ideas are welcome for:
+
+- Better token compression strategies  
+- Multi-model optimization  
+- Streaming CLI support  
+
+note: Explore the `CONTRIBUTING.md` for more details for the contributons.
+
+---
+
 ## 📄 License
 
 MIT License
 
 ---
 
-## ⭐ Support
+## ❤️ Support This Project
 
-If you find this useful, please give it a star ⭐
+TokenWise is built to help developers reduce LLM cost and improve efficiency.
+
+If it helps you, consider supporting its development:
+
+- ❤️ GitHub Sponsors → https://github.com/sponsors/sohqureshi   
 
 ---
 
