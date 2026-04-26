@@ -375,46 +375,81 @@
   </div>
 
   <!-- SOLUTION -->
-  <div class="section">
-    <h2>🚀 The Solution</h2>
+<div class="section">
+  <h2>🚀 The Solution</h2>
+
+  <div class="card">
+    <p>
+      <b>TokenWise intelligently reduces LLM payload size</b> by pruning, compressing, and restructuring JSON before it reaches the model.
+    </p>
+
+    <p style="margin-top:10px; color:#94a3b8;">
+      Less noise → fewer tokens → lower API cost → faster responses.
+    </p>
+  </div>
+</div>
+
+
+<!-- CLI -->
+<div class="section">
+  <h2>💻 CLI Usage</h2>
+
+  <div class="card">
+    <p style="margin-bottom:10px; color:#94a3b8;">
+      Optimize any JSON file directly from your terminal:
+    </p>
+
+    <pre style="background:#0b1220; padding:12px; border-radius:10px; overflow-x:auto;">
+node cli/index.js optimize input.json
+    </pre>
+
+    <p style="margin-top:10px; font-size:13px; color:#64748b;">
+      Tip: Works best with nested API payloads or LLM prompts.
+    </p>
+  </div>
+</div>
+
+
+<!-- EXAMPLE -->
+<div class="section">
+  <h2>📉 Example Transformation</h2>
+
+  <div class="grid">
 
     <div class="card">
-      TokenWise compresses and optimizes JSON before sending it to LLMs — reducing cost without losing meaning.
-    </div>
-  </div>
-
-  <!-- CLI -->
-  <div class="section">
-    <h2>💻 CLI Usage</h2>
-
-    <pre>node cli/index.js optimize input.json</pre>
-  </div>
-
-  <!-- EXAMPLE -->
-  <div class="section">
-    <h2>📉 Example</h2>
-
-    <div class="grid">
-
-      <div class="card">
-        <b>Input</b>
-        <pre>{
+      <b style="color:#38bdf8;">Input (Verbose JSON)</b>
+      <pre style="margin-top:10px;">
+{
   "user": {
     "name": "John",
     "preferences": {
       "theme": "dark"
     }
   }
-}</pre>
-      </div>
-
-      <div class="card">
-        <b>Output</b>
-        <pre>{"user":{"name":"John","preferences":{"theme":"dark"}}}</pre>
-      </div>
-
+}
+      </pre>
     </div>
+
+    <div class="card">
+      <b style="color:#22c55e;">Output (Optimized)</b>
+      <pre style="margin-top:10px;">
+{
+  "user": {
+    "name": "John",
+    "preferences": {
+      "theme": "dark"
+    }
+  }
+}
+      </pre>
+
+      <p style="margin-top:10px; font-size:13px; color:#94a3b8;">
+        Same meaning. Lower token footprint. Faster LLM processing.
+      </p>
+    </div>
+
   </div>
+</div>
 
   <!-- SUPPORT -->
   <div class="section">
