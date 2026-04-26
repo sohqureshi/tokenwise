@@ -128,7 +128,7 @@ More tokens = more cost 💸
 
 ---
 
-## Focus on *CLI Value*
+## 🖥️ Focus on *CLI Value*
 
 Run TokenWise locally
 
