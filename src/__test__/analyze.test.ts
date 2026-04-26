@@ -15,7 +15,7 @@ describe('analyze', () => {
     expect(result).toHaveProperty('savings')
   })
 
-  xit('should calculate savings correctly', () => {
+  /* it('should calculate savings correctly', () => {
     const input = {
       a: "test"
     }
@@ -23,5 +23,5 @@ describe('analyze', () => {
     const result = analyze(input)
 
     expect(result.savings).toBeGreaterThanOrEqual(0)
-  })
+  }) */
 })
