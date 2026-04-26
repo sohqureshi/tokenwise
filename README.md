@@ -188,7 +188,7 @@ TokenWise is built to help developers reduce LLM cost and improve efficiency.
 
 If it helps you, consider supporting its development:
 
-- ❤️ GitHub Sponsors → https://github.com/sponsors/sohqureshi   
+- ❤️ GitHub Sponsors →    [![Sponsor](https://img.shields.io/badge/❤️%20GitHub%20Sponsors-View-red?style=for-the-badge&logo=github)](https://github.com/sponsors/sohqureshi)
 
 ---
 
