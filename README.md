@@ -128,7 +128,9 @@ More tokens = more cost 💸
 
 ---
 
-## 🎥 Demo
+## Focus on *CLI Value*
+
+Run TokenWise locally
 
 ```bash
 node demo.js
