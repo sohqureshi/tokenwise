@@ -4,7 +4,7 @@
 ![downloads](https://img.shields.io/npm/dw/tokenwise)
 ![license](https://img.shields.io/github/license/sohqureshi/tokenwise)
 ![stars](https://img.shields.io/github/stars/sohqureshi/tokenwise?style=social)
-[![Support](https://img.shields.io/badge/❤️%20Support%20Me%20Improve%20Tokenwise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
+[![Support](https://img.shields.io/badge/❤️%20Support%20Tokenwise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
 
 > Stop sending raw JSON to LLMs. Optimize first. Save tokens. Save money.
 
