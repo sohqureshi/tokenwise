@@ -1,28 +1,222 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>TokenWise - Reduce LLM Costs</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>TokenWise - Reduce LLM Costs</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, Arial;
+    background: #0b0f19;
+    color: #ffffff;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 40px 20px;
+  }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #1f2937;
+    border-radius: 20px;
+    font-size: 12px;
+    margin-bottom: 20px;
+    color: #93c5fd;
+  }
+
+  h1 {
+    font-size: 48px;
+    margin: 10px 0;
+    background: linear-gradient(90deg, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  p.subtitle {
+    font-size: 18px;
+    color: #cbd5e1;
+    max-width: 600px;
+    margin: auto;
+  }
+
+  .buttons {
+    margin-top: 30px;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .primary {
+    background: #3b82f6;
+    color: white;
+  }
+
+  .secondary {
+    background: #111827;
+    border: 1px solid #374151;
+    color: white;
+  }
+
+  /* SECTION */
+  .section {
+    margin-top: 80px;
+  }
+
+  h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: #111827;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #1f2937;
+  }
+
+  pre {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 100px;
+    padding: 30px;
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  a {
+    color: #60a5fa;
+  }
+</style>
 </head>
-<body style="font-family: Arial; max-width: 800px; margin: auto;">
 
-  <h1>🚀 TokenWise</h1>
+<body>
 
-  <p>
-    Optimize JSON before sending it to LLMs and reduce API costs instantly.
-  </p>
+<div class="container">
 
-  <h2>⚡ Why TokenWise?</h2>
-  <ul>
-    <li>Reduce token usage</li>
-    <li>Lower OpenAI API cost</li>
-    <li>Faster LLM responses</li>
-  </ul>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">⚡ Reduce LLM API Costs</div>
 
-  <h2>💻 CLI</h2>
-  <pre>node cli/index.js optimize input.json</pre>
+    <h1>TokenWise</h1>
 
-  <h2>❤️ Support</h2>
-  <a href="https://github.com/sponsors/sohqureshi">Sponsor on GitHub</a>
+    <p class="subtitle">
+      Optimize JSON before sending it to LLMs.
+      Reduce token usage, lower API costs, and improve performance instantly.
+    </p>
+
+    <div class="buttons">
+      <a class="btn primary" href="https://github.com/sohqureshi/tokenwise">View on GitHub</a>
+      <a class="btn secondary" href="https://github.com/sponsors/sohqureshi">❤️ Support Project</a>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <div class="section">
+    <h2>⚠️ The Problem</h2>
+
+    <div class="grid">
+      <div class="card">
+        ❌ Raw JSON increases token cost
+      </div>
+      <div class="card">
+        ❌ Extra structure wastes LLM budget
+      </div>
+      <div class="card">
+        ❌ Slower responses from large payloads
+      </div>
+    </div>
+  </div>
+
+  <!-- SOLUTION -->
+  <div class="section">
+    <h2>🚀 The Solution</h2>
+
+    <div class="card">
+      TokenWise compresses and optimizes JSON before sending it to LLMs — reducing cost without losing meaning.
+    </div>
+  </div>
+
+  <!-- CLI -->
+  <div class="section">
+    <h2>💻 CLI Usage</h2>
+
+    <pre>node cli/index.js optimize input.json</pre>
+  </div>
+
+  <!-- EXAMPLE -->
+  <div class="section">
+    <h2>📉 Example</h2>
+
+    <div class="grid">
+
+      <div class="card">
+        <b>Input</b>
+        <pre>{
+  "user": {
+    "name": "John",
+    "preferences": {
+      "theme": "dark"
+    }
+  }
+}</pre>
+      </div>
+
+      <div class="card">
+        <b>Output</b>
+        <pre>{"user":{"name":"John","preferences":{"theme":"dark"}}}</pre>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="section">
+    <h2>❤️ Support This Project</h2>
+
+    <div class="card">
+      Help improve TokenWise and reduce LLM costs further for everyone.
+
+      <br><br>
+
+      <a href="https://github.com/sponsors/sohqureshi">❤️ Sponsor on GitHub</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Built for developers working with LLMs • TokenWise
+</footer>
 
 </body>
 </html>
