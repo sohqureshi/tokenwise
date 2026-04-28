@@ -5,8 +5,7 @@ import { toTOON } from "./toon";
 import { estimateTokens } from "./token";
 
 /**
- * Analyzes token savings after optimization
- * Compatible with your current core structure (April 2026)
+ * Safe version of analyze() - Prevents NaN values
  */
 export function analyze(input: any, options: any = {}) {
   if (!input || (typeof input === "object" && input !== null && Object.keys(input).length === 0)) {
@@ -21,32 +20,33 @@ export function analyze(input: any, options: any = {}) {
   }
 
   // 1. Original tokens
-  const originalTokens = estimateTokens(input);
+  let originalTokens = estimateTokens(input);
+  if (isNaN(originalTokens) || !isFinite(originalTokens)) originalTokens = 0;
 
-  // 2. Optimization chain (using only existing functions)
+  // 2. Optimization chain
   let optimizedData = input;
 
   if (options.prune && Array.isArray(options.prune)) {
-    optimizedData = prune(optimizedData);           // Fixed: 1 argument only
+    optimizedData = prune(optimizedData);
   }
 
   if (options.compact) {
-    optimizedData = compact(optimizedData);         // 1 argument
+    optimizedData = compact(optimizedData);
   }
 
   if (options.flatten) {
-    optimizedData = flatten(optimizedData);         // 1 argument
+    optimizedData = flatten(optimizedData);
   }
 
-  // toTOON support (your existing toon.ts)
   if (options.toTOON === true || options.toon === true) {
     optimizedData = toTOON(optimizedData);
   }
 
   // 3. Optimized tokens
-  const optimizedTokens = estimateTokens(optimizedData);
+  let optimizedTokens = estimateTokens(optimizedData);
+  if (isNaN(optimizedTokens) || !isFinite(optimizedTokens)) optimizedTokens = 0;
 
-  // 4. Calculate savings safely (never negative)
+  // 4. Safe savings calculation
   const savings = Math.max(0, originalTokens - optimizedTokens);
 
   const savingsPercent = originalTokens > 0
