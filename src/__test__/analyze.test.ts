@@ -35,7 +35,8 @@ describe('analyze()', () => {
     expect(result.originalTokens).not.toBeNaN();
     expect(result.optimizedTokens).not.toBeNaN();
   });
-
+ 
+// testing handle empty input-
   it('should handle empty input gracefully', () => {
     const result1 = analyze(null);
     const result2 = analyze({});
