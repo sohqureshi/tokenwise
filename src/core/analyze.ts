@@ -5,8 +5,8 @@ import { toTOON } from "./toon";
 import { estimateTokens } from "./token";
 
 /**
- * Analyzes token usage and savings after applying optimization steps.
- * Fixed version - compatible with your current core folder structure.
+ * Analyzes token savings after optimization
+ * Compatible with your current core structure (April 2026)
  */
 export function analyze(input: any, options: any = {}) {
   if (!input || (typeof input === "object" && input !== null && Object.keys(input).length === 0)) {
@@ -20,36 +20,33 @@ export function analyze(input: any, options: any = {}) {
     };
   }
 
-  // 1. Calculate original tokens
-  const originalTokens = estimateTokens(input, options);
+  // 1. Original tokens
+  const originalTokens = estimateTokens(input);
 
-  // 2. Run optimization chain (only using existing modules)
+  // 2. Optimization chain (using only existing functions)
   let optimizedData = input;
 
   if (options.prune && Array.isArray(options.prune)) {
-    optimizedData = prune(optimizedData, options.prune);           // Fixed: removed 3rd argument
+    optimizedData = prune(optimizedData);           // Fixed: 1 argument only
   }
 
   if (options.compact) {
-    optimizedData = compact(optimizedData);
+    optimizedData = compact(optimizedData);         // 1 argument
   }
 
   if (options.flatten) {
-    optimizedData = flatten(optimizedData);
+    optimizedData = flatten(optimizedData);         // 1 argument
   }
 
-  // Note: toNatural is not available in your core folder, so skipping it for now
-  // You can add it later when you create toNatural.ts
-
-  // 3. Apply toTOON (your existing toon.ts)
+  // toTOON support (your existing toon.ts)
   if (options.toTOON === true || options.toon === true) {
     optimizedData = toTOON(optimizedData);
   }
 
-  // 4. Calculate optimized tokens
-  const optimizedTokens = estimateTokens(optimizedData, options);
+  // 3. Optimized tokens
+  const optimizedTokens = estimateTokens(optimizedData);
 
-  // 5. Calculate savings (never negative)
+  // 4. Calculate savings safely (never negative)
   const savings = Math.max(0, originalTokens - optimizedTokens);
 
   const savingsPercent = originalTokens > 0
