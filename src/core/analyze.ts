@@ -1,41 +1,53 @@
-import { toTOON } from "./toon";
-import { estimateTokens } from "./token";
+import { prune } from "./prune";
+import { compact } from "./compact";
+import { flatten } from "./flatten";
+import { toNatural } from "./toNatural";
+import { estimateTokens } from "./estimateTokens";
 
 /**
- * Analyzes the input data and returns token usage comparison
- * between original JSON and optimized TOON format.
- * 
- * This fixes the failing test by ensuring 'savings' is never negative.
+ * Analyzes the input data and returns detailed token savings
+ * after applying the optimization chain.
+ *
+ * Key Fix: savings is now guaranteed to be >= 0
  */
-export function analyze(input: any) {
-  // Handle edge cases
+export function analyze(input: any, options: any = {}) {
   if (!input || (typeof input === "object" && input !== null && Object.keys(input).length === 0)) {
     return {
       originalTokens: 0,
       optimizedTokens: 0,
       savings: 0,
       savingsPercent: 0,
-      original: "",
-      optimized: "",
+      optimizedData: null,
+      reductionRatio: 1,
     };
   }
 
-  // 1. Get original JSON representation
-  const original = JSON.stringify(input);
+  // 1. Calculate original tokens
+  const originalTokens = estimateTokens(input, options);
 
-  // 2. Get optimized TOON representation
-  const optimized = toTOON(input);
+  // 2. Run the optimization chain (respecting options)
+  let optimizedData = input;
 
-  // 3. Estimate tokens (use estimateTokens if available, otherwise fallback)
-  const originalTokens = typeof estimateTokens === "function"
-    ? estimateTokens(input)
-    : countTokens(original);
+  if (options.prune && Array.isArray(options.prune)) {
+    optimizedData = prune(optimizedData, options.prune, options);
+  }
 
-  const optimizedTokens = typeof estimateTokens === "function"
-    ? estimateTokens(optimized)
-    : countTokens(optimized);
+  if (options.compact) {
+    optimizedData = compact(optimizedData, options.compactOptions || {});
+  }
 
-  // 4. Calculate savings - NEVER allow negative savings
+  if (options.flatten) {
+    optimizedData = flatten(optimizedData, options.flattenOptions || {});
+  }
+
+  if (options.toNatural) {
+    optimizedData = toNatural(optimizedData, options.naturalOptions || {});
+  }
+
+  // 3. Calculate optimized tokens
+  const optimizedTokens = estimateTokens(optimizedData, options);
+
+  // 4. Calculate savings (Never negative)
   const savings = Math.max(0, originalTokens - optimizedTokens);
 
   // 5. Calculate savings percentage safely
@@ -43,23 +55,19 @@ export function analyze(input: any) {
     ? Math.round((savings / originalTokens) * 100)
     : 0;
 
+  const reductionRatio = originalTokens > 0 
+    ? optimizedTokens / originalTokens 
+    : 1;
+
   return {
     originalTokens,
     optimizedTokens,
-    savings,                    // ← Fixed: Now always >= 0
+    savings,
     savingsPercent,
-    original,
-    optimized,
+    optimizedData,
+    reductionRatio,
+    // Optional: useful for debugging
+    // original: JSON.stringify(input),
+    // optimized: JSON.stringify(optimizedData),
   };
-}
-
-/**
- * Simple fallback token counter when estimateTokens is not available
- */
-function countTokens(text: string | any): number {
-  const str = typeof text === "string" ? text : JSON.stringify(text);
-  // Basic estimation: split on whitespace and punctuation
-  return str
-    .split(/[\s.,;:!?()[\]{}"']+/)
-    .filter(Boolean).length;
 }
