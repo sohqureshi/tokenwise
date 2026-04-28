@@ -1,14 +1,12 @@
 import { prune } from "./prune";
 import { compact } from "./compact";
 import { flatten } from "./flatten";
-import { toNatural } from "./toNatural";
-import { estimateTokens } from "./estimateTokens";
+import { toTOON } from "./toon";
+import { estimateTokens } from "./token";
 
 /**
- * Analyzes the input data and returns detailed token savings
- * after applying the optimization chain.
- *
- * Key Fix: savings is now guaranteed to be >= 0
+ * Analyzes token usage and savings after applying optimization steps.
+ * Fixed version - compatible with your current core folder structure.
  */
 export function analyze(input: any, options: any = {}) {
   if (!input || (typeof input === "object" && input !== null && Object.keys(input).length === 0)) {
@@ -25,32 +23,35 @@ export function analyze(input: any, options: any = {}) {
   // 1. Calculate original tokens
   const originalTokens = estimateTokens(input, options);
 
-  // 2. Run the optimization chain (respecting options)
+  // 2. Run optimization chain (only using existing modules)
   let optimizedData = input;
 
   if (options.prune && Array.isArray(options.prune)) {
-    optimizedData = prune(optimizedData, options.prune, options);
+    optimizedData = prune(optimizedData, options.prune);           // Fixed: removed 3rd argument
   }
 
   if (options.compact) {
-    optimizedData = compact(optimizedData, options.compactOptions || {});
+    optimizedData = compact(optimizedData);
   }
 
   if (options.flatten) {
-    optimizedData = flatten(optimizedData, options.flattenOptions || {});
+    optimizedData = flatten(optimizedData);
   }
 
-  if (options.toNatural) {
-    optimizedData = toNatural(optimizedData, options.naturalOptions || {});
+  // Note: toNatural is not available in your core folder, so skipping it for now
+  // You can add it later when you create toNatural.ts
+
+  // 3. Apply toTOON (your existing toon.ts)
+  if (options.toTOON === true || options.toon === true) {
+    optimizedData = toTOON(optimizedData);
   }
 
-  // 3. Calculate optimized tokens
+  // 4. Calculate optimized tokens
   const optimizedTokens = estimateTokens(optimizedData, options);
 
-  // 4. Calculate savings (Never negative)
+  // 5. Calculate savings (never negative)
   const savings = Math.max(0, originalTokens - optimizedTokens);
 
-  // 5. Calculate savings percentage safely
   const savingsPercent = originalTokens > 0
     ? Math.round((savings / originalTokens) * 100)
     : 0;
@@ -66,8 +67,5 @@ export function analyze(input: any, options: any = {}) {
     savingsPercent,
     optimizedData,
     reductionRatio,
-    // Optional: useful for debugging
-    // original: JSON.stringify(input),
-    // optimized: JSON.stringify(optimizedData),
   };
 }
