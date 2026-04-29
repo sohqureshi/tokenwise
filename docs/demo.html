@@ -378,52 +378,52 @@
         </div>
 
         <div class="tab-buttons">
-          <button class="tab-btn active" onclick="showTab('analyze')">📊 Analyze</button>
-          <button class="tab-btn" onclick="showTab('compact')">📦 Compact</button>
-          <button class="tab-btn" onclick="showTab('flatten')">📏 Flatten</button>
-          <button class="tab-btn" onclick="showTab('prune')">✂️ Prune</button>
-          <button class="tab-btn" onclick="showTab('natural')">💬 Natural</button>
-          <button class="tab-btn" onclick="showTab('toon')">📝 TOON</button>
+          <button class="tab-btn active" data-tab="analyze" onclick="showTab('analyze', event)">📊 Analyze</button>
+          <button class="tab-btn" data-tab="compact" onclick="showTab('compact', event)">📦 Compact</button>
+          <button class="tab-btn" data-tab="flatten" onclick="showTab('flatten', event)">📏 Flatten</button>
+          <button class="tab-btn" data-tab="prune" onclick="showTab('prune', event)">✂️ Prune</button>
+          <button class="tab-btn" data-tab="natural" onclick="showTab('natural', event)">💬 Natural</button>
+          <button class="tab-btn" data-tab="toon" onclick="showTab('toon', event)">📝 TOON</button>
         </div>
 
         <!-- Analyze Tab -->
         <div id="analyze" class="tab-content active">
-          <div class="info-box">Detailed analysis of your JSON structure and token usage</div>
+          <div class="info-box">Analysis of token distribution and usage (CLI + Web support planned).</div>
           <div class="output-box" id="analyzeOutput">Enter valid JSON to analyze</div>
           <button class="copy-btn" onclick="copyOutput('analyzeOutput')">📋 Copy Output</button>
         </div>
 
         <!-- Compact Tab -->
         <div id="compact" class="tab-content">
-          <div class="info-box">Remove whitespace and reduce JSON size</div>
+          <div class="info-box">Compress structure intelligently without losing semantic meaning.</div>
           <div class="output-box" id="compactOutput">Enter valid JSON to compact</div>
           <button class="copy-btn" onclick="copyOutput('compactOutput')">📋 Copy Output</button>
         </div>
 
         <!-- Flatten Tab -->
         <div id="flatten" class="tab-content">
-          <div class="info-box">Flatten nested objects into a single level</div>
+          <div class="info-box">Flatten deeply nested objects into clean, AI-readable structures.</div>
           <div class="output-box" id="flattenOutput">Enter valid JSON to flatten</div>
           <button class="copy-btn" onclick="copyOutput('flattenOutput')">📋 Copy Output</button>
         </div>
 
         <!-- Prune Tab -->
         <div id="prune" class="tab-content">
-          <div class="info-box">Remove unnecessary fields (id, debug, internal, createdAt, updatedAt)</div>
+          <div class="info-box">Remove unnecessary fields and reduce payload noise before sending to LLMs.</div>
           <div class="output-box" id="pruneOutput">Enter valid JSON to prune</div>
           <button class="copy-btn" onclick="copyOutput('pruneOutput')">📋 Copy Output</button>
         </div>
 
         <!-- Natural Tab -->
         <div id="natural" class="tab-content">
-          <div class="info-box">Convert to natural language description of your data</div>
+          <div class="info-box">Convert your JSON data into natural language descriptions for better LLM understanding.</div>
           <div class="output-box" id="naturalOutput">Enter valid JSON to convert</div>
           <button class="copy-btn" onclick="copyOutput('naturalOutput')">📋 Copy Output</button>
         </div>
 
         <!-- TOON Tab -->
         <div id="toon" class="tab-content">
-          <div class="info-box">Convert to TOON (Text Object Object Notation) format</div>
+          <div class="info-box">Convert your JSON data to TOON (Text Object Object Notation) format</div>
           <div class="output-box" id="toonOutput">Enter valid JSON to convert</div>
           <button class="copy-btn" onclick="copyOutput('toonOutput')">📋 Copy Output</button>
         </div>
@@ -789,7 +789,36 @@ Size:
       }
     }
 
-    function showTab(tabName) {
+    const TAB_ALIASES = {
+      analyze: 'analyze',
+      analysis: 'analyze',
+      compact: 'compact',
+      flatten: 'flatten',
+      prune: 'prune',
+      natural: 'natural',
+      toon: 'toon'
+    };
+    const VALID_TABS = Object.keys(TAB_ALIASES).filter((key) => TAB_ALIASES[key] === key);
+
+    function normalizeTabName(rawTab) {
+      const normalized = String(rawTab || '')
+        .toLowerCase()
+        .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
+        .replace(/[^a-z]/g, '');
+      return TAB_ALIASES[normalized] || 'analyze';
+    }
+
+    function resolveTabFromURL() {
+      const url = new URL(window.location.href);
+      const queryTab = url.searchParams.get('tab');
+      const hashTab = url.hash ? url.hash.slice(1) : '';
+      return normalizeTabName(queryTab || hashTab);
+    }
+
+    function showTab(tabName, event, options = {}) {
+      const safeTab = normalizeTabName(tabName);
+      const { updateURL = true } = options;
+
       // Hide all tabs
       document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -799,8 +828,16 @@ Size:
       });
 
       // Show selected tab
-      document.getElementById(tabName).classList.add('active');
-      event.target.classList.add('active');
+      document.getElementById(safeTab).classList.add('active');
+      const activeButton = event?.currentTarget || document.querySelector(`.tab-btn[data-tab="${safeTab}"]`);
+      if (activeButton) activeButton.classList.add('active');
+
+      // Keep URL in sync with selected tab
+      if (updateURL) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', safeTab);
+        window.history.replaceState({}, '', url);
+      }
 
       // Process if needed
       processAndDisplay();
@@ -869,9 +906,10 @@ Size:
     input.addEventListener('input', processAndDisplay);
     input.addEventListener('change', processAndDisplay);
 
-    // Load example on page load
+    // Load example and activate URL-driven tab on page load
     window.addEventListener('load', () => {
       loadExample();
+      showTab(resolveTabFromURL(), null, { updateURL: false });
     });
   </script>
 
