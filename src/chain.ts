@@ -3,6 +3,7 @@ import { flatten } from './core/flatten'
 import { compact } from './core/compact'
 import { analyze } from './core/analyze'
 import { toTOON } from "./core/toon";
+import { toNatural } from "./core/natural";
 
 
 export class AIChain {
@@ -22,9 +23,18 @@ export class AIChain {
     return this;
   }
 
+  flatten() {
+    this.data = flatten(this.data);
+    return this;
+  }
+
   toTOON() {
     this.data = toTOON(this.data);
     return this;
+  }
+
+  toNatural() {
+    return toNatural(this.data);
   }
 
   analyze() {

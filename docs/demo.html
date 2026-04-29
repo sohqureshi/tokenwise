@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="TokenWise Demo - Interactive tool to optimize JSON and visualize token usage." />
+  <title>TokenWise Demo | Interactive JSON Optimizer</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #38bdf8;
+      --primary-dark: #0ea5e9;
+      --secondary: #a78bfa;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #0f172a 0%, #020617 80%);
+      color: #e2e8f0;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .nav {
+      background: rgba(30, 41, 59, 0.8);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav a:hover {
+      color: var(--primary);
+    }
+
+    .nav .logo {
+      color: var(--primary);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .header p {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+
+    .demo-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      min-height: 600px;
+    }
+
+    @media (max-width: 1024px) {
+      .demo-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: rgba(30, 41, 59, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 20px;
+      padding: 28px;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title .icon {
+      font-size: 1.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .input-group label {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    #jsonInput {
+      flex: 1;
+      background: #1e2937;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      color: #cbd5e1;
+      font-family: ui-monospace, monospace;
+      font-size: 0.95rem;
+      resize: none;
+      line-height: 1.5;
+      min-height: 300px;
+    }
+
+    #jsonInput:focus {
+      outline: none;
+      border-color: rgba(56, 189, 248, 0.3);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      background: var(--primary);
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .output-tabs {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 10px 16px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      flex: 1;
+      overflow: hidden;
+      display: none;
+    }
+
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .output-box {
+      background: #1e2937;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      font-family: ui-monospace, monospace;
+      font-size: 0.92rem;
+      overflow: auto;
+      flex: 1;
+      max-height: 100%;
+      line-height: 1.5;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .stat {
+      background: rgba(56, 189, 248, 0.05);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(56, 189, 248, 0.1);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .copy-btn {
+      padding: 6px 12px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      color: var(--primary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    .copy-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+    }
+
+    .info-box {
+      background: rgba(56, 189, 248, 0.05);
+      border: 1px solid rgba(56, 189, 248, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748b;
+      font-size: 0.95rem;
+      border-top: 1px solid rgba(148, 163, 184, 0.1);
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <div class="nav">
+    <div class="logo">TokenWise</div>
+    <a href="index.html">← Back to Home</a>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <div class="header">
+      <h1>Interactive Demo</h1>
+      <p>Paste your JSON below and explore all features in real-time</p>
+    </div>
+
+    <!-- Demo Layout -->
+    <div class="demo-layout">
+      <!-- Input Panel -->
+      <div class="panel">
+        <div class="panel-title">
+          <span class="icon">📝</span>
+          <span>JSON Input</span>
+        </div>
+        <div class="input-group">
+          <textarea id="jsonInput" placeholder='{
+  "user": {
+    "id": "12345",
+    "name": "Alice Johnson",
+    "email": "alice@example.com",
+    "profile": {
+      "theme": "dark",
+      "notifications": true,
+      "createdAt": "2024-01-01"
+    }
+  },
+  "debug": true,
+  "metadata": {
+    "version": "1.0"
+  }
+}'></textarea>
+          <div class="buttons">
+            <button class="btn" onclick="loadExample()">📋 Load Example</button>
+            <button class="btn secondary" onclick="clearInput()">🗑️ Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="panel">
+        <div class="panel-title">
+          <span class="icon">⚙️</span>
+          <span>Features & Output</span>
+        </div>
+
+        <div class="tab-buttons">
+          <button class="tab-btn active" onclick="showTab('analyze')">📊 Analyze</button>
+          <button class="tab-btn" onclick="showTab('compact')">📦 Compact</button>
+          <button class="tab-btn" onclick="showTab('flatten')">📏 Flatten</button>
+          <button class="tab-btn" onclick="showTab('prune')">✂️ Prune</button>
+          <button class="tab-btn" onclick="showTab('natural')">💬 Natural</button>
+          <button class="tab-btn" onclick="showTab('toon')">📝 TOON</button>
+        </div>
+
+        <!-- Analyze Tab -->
+        <div id="analyze" class="tab-content active">
+          <div class="info-box">Detailed analysis of your JSON structure and token usage</div>
+          <div class="output-box" id="analyzeOutput">Enter valid JSON to analyze</div>
+          <button class="copy-btn" onclick="copyOutput('analyzeOutput')">📋 Copy Output</button>
+        </div>
+
+        <!-- Compact Tab -->
+        <div id="compact" class="tab-content">
+          <div class="info-box">Remove whitespace and reduce JSON size</div>
+          <div class="output-box" id="compactOutput">Enter valid JSON to compact</div>
+          <button class="copy-btn" onclick="copyOutput('compactOutput')">📋 Copy Output</button>
+        </div>
+
+        <!-- Flatten Tab -->
+        <div id="flatten" class="tab-content">
+          <div class="info-box">Flatten nested objects into a single level</div>
+          <div class="output-box" id="flattenOutput">Enter valid JSON to flatten</div>
+          <button class="copy-btn" onclick="copyOutput('flattenOutput')">📋 Copy Output</button>
+        </div>
+
+        <!-- Prune Tab -->
+        <div id="prune" class="tab-content">
+          <div class="info-box">Remove unnecessary fields (id, debug, internal, createdAt, updatedAt)</div>
+          <div class="output-box" id="pruneOutput">Enter valid JSON to prune</div>
+          <button class="copy-btn" onclick="copyOutput('pruneOutput')">📋 Copy Output</button>
+        </div>
+
+        <!-- Natural Tab -->
+        <div id="natural" class="tab-content">
+          <div class="info-box">Convert to natural language description of your data</div>
+          <div class="output-box" id="naturalOutput">Enter valid JSON to convert</div>
+          <button class="copy-btn" onclick="copyOutput('naturalOutput')">📋 Copy Output</button>
+        </div>
+
+        <!-- TOON Tab -->
+        <div id="toon" class="tab-content">
+          <div class="info-box">Convert to TOON (Text Object Object Notation) format</div>
+          <div class="output-box" id="toonOutput">Enter valid JSON to convert</div>
+          <button class="copy-btn" onclick="copyOutput('toonOutput')">📋 Copy Output</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>TokenWise Demo • Optimize your JSON for LLM efficiency</p>
+    <p style="margin-top:12px; font-size:0.85rem;"><a href="https://github.com/sohqureshi/tokenwise" target="_blank" style="color: var(--primary); text-decoration: none;">View on GitHub</a></p>
+  </footer>
+
+  <script>
+    // ========== INLINE CORE FUNCTIONS (works with file:// protocol) ==========
+    // These mirror the actual implementations in src/core/
+
+    function isValidJSON(str) {
+      try {
+        JSON.parse(str);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function parseJSON(str) {
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        throw new Error(`Invalid JSON: ${e.message}`);
+      }
+    }
+
+    // === PRUNE: Remove unnecessary fields ===
+    function prune(obj, options = {}) {
+      const {
+        removeKeys = ['id', 'debug', 'internal', 'createdAt', 'updatedAt'],
+        removeNull = true,
+        removeUndefined = true,
+        removeEmptyObjects = true,
+        removeEmptyArrays = false
+      } = options;
+
+      if (obj === null) return removeNull ? undefined : obj;
+      if (obj === undefined) return removeUndefined ? undefined : obj;
+      if (typeof obj !== "object") return obj;
+
+      if (Array.isArray(obj)) {
+        const arr = obj
+          .map((item) => prune(item, options))
+          .filter((item) => item !== undefined);
+        if (removeEmptyArrays && arr.length === 0) return undefined;
+        return arr;
+      }
+
+      const result = {};
+      for (const key in obj) {
+        if (removeKeys.includes(key)) continue;
+        const value = prune(obj[key], options);
+        if (value === undefined) continue;
+        if (removeEmptyObjects && typeof value === 'object' && value !== null && 
+            !Array.isArray(value) && Object.keys(value).length === 0) continue;
+        result[key] = value;
+      }
+      return result;
+    }
+
+    // === FLATTEN: Flatten nested objects with dot notation ===
+    function flatten(obj, prefix = '', res = {}) {
+      if (obj === null || obj === undefined) return res;
+      if (typeof obj !== 'object') {
+        res[prefix] = obj;
+        return res;
+      }
+      for (const key in obj) {
+        const value = obj[key];
+        const newKey = prefix ? `${prefix}.${key}` : key;
+        if (typeof value === 'object' && value !== null) {
+          flatten(value, newKey, res);
+        } else {
+          res[newKey] = value;
+        }
+      }
+      return res;
+    }
+
+    // === COMPACT: Minify JSON ===
+    function compact(obj) {
+      return JSON.stringify(obj);
+    }
+
+    // === TOON: Convert to TOON format ===
+    function toTOON(data, indent = 0) {
+      const space = "  ".repeat(indent);
+      if (Array.isArray(data)) {
+        if (data.length === 0) return "[]";
+        if (typeof data[0] === 'object' && data[0] !== null) {
+          const keys = Object.keys(data[0]);
+          const values = data.map(item => 
+            keys.map(k => `${item[k] !== null ? item[k] : 'null'}`).join(',')
+          ).join('\n' + space);
+          return `${keys.join(',')}\n${space}${values}`;
+        }
+        return "[\n" + space + "  " + data.map((item, i) => `[${i}] ${toTOON(item, indent + 1).trim()}`).join("\n" + space + "  ") + "\n" + space + "]";
+      }
+      if (data === null) return "null";
+      if (typeof data === 'string') return `"${data}"`;
+      if (typeof data !== 'object') return String(data);
+      
+      const entries = Object.entries(data).map(([k, v]) => `${space}  ${k}: ${toTOON(v, indent + 1).trim()}`).join('\n');
+      return entries ? `{\n${entries}\n${space}}` : "{}";
+    }
+
+    // === TO_NATURAL: Convert to natural language story with context ===
+    function toNatural(data, depth = 0) {
+      if (data === null || data === undefined) return "nothing";
+      if (typeof data === 'string') return data;
+      if (typeof data === 'number') return String(data);
+      if (typeof data === 'boolean') return data ? "yes" : "no";
+      
+      if (Array.isArray(data)) {
+        if (data.length === 0) return "empty list";
+        // Join array items with proper grammar
+        const items = data.map(item => toNatural(item, depth + 1));
+        if (items.length === 1) return items[0];
+        const lastItem = items.pop();
+        return items.join(", ") + " and " + lastItem;
+      }
+      
+      if (typeof data === 'object') {
+        return buildContextualStory(data, depth);
+      }
+      
+      return String(data);
+    }
+
+    function buildContextualStory(obj, depth = 0) {
+      // Look for a name in nested objects first (like 'user' or 'profile')
+      let name = obj.name || obj.userName || obj.user;
+      
+      // If name is an object, extract the name property from it
+      if (typeof name === 'object' && name !== null && name.name) {
+        name = name.name;
+      }
+      
+      // Get all entries, including nested objects but not certain meta fields
+      const entries = Object.entries(obj).filter(([key]) => {
+        // Skip technical/meta fields at root level
+        return !['id', 'timestamp', 'apiKey'].includes(key);
+      });
+
+      if (entries.length === 0) return "";
+
+      // Start with subject if name exists
+      let story = name && typeof name === 'string' ? `User ${name}` : "";
+
+      // Build property clauses
+      const clauses = entries
+        .map(([key, value]) => {
+          // If this is a 'user' object and we already used the name, extract its properties
+          if (key === 'user' && name) {
+            const userProps = Object.entries(value)
+              .filter(([k]) => !['id', 'name', 'timestamp', 'apiKey'].includes(k))
+              .map(([k, v]) => formatPropertyClause(k, v, depth + 1))
+              .filter(c => c !== null && c !== "")
+              .join(", ");
+            return userProps ? `(${userProps})` : null;
+          }
+          return formatPropertyClause(key, value, depth);
+        })
+        .filter(c => c !== null && c !== "");
+
+      if (clauses.length === 0) return story;
+
+      // Combine with proper punctuation
+      if (story) {
+        story += " " + clauses.join(", ");
+      } else {
+        story = clauses.join(", ");
+      }
+
+      return story + ".";
+    }
+
+    function formatPropertyClause(key, value, depth) {
+      const naturalKey = camelToWords(key);
+
+      // Handle nested objects
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        // Skip technical objects
+        if (['internal', 'metadata', 'debug'].includes(key)) {
+          return null;
+        }
+        
+        const nested = Object.entries(value)
+          .filter(([k]) => !['id', 'timestamp', 'apiKey', 'createdAt', 'updatedAt'].includes(k))
+          .map(([k, v]) => {
+            const propValue = toNatural(v, depth + 1);
+            if (propValue === "yes" || propValue === "no") {
+              return `${camelToWords(k)} ${propValue === "yes" ? "enabled" : "disabled"}`;
+            }
+            return `${camelToWords(k)} ${propValue}`;
+          })
+          .filter(c => c && c.trim())
+          .join(", ");
+        
+        if (!nested) return null;
+        // Don't wrap in extra parentheses - let the parent handle it
+        return `${naturalKey}: ${nested}`;
+      }
+
+      // Handle arrays
+      if (Array.isArray(value)) {
+        if (value.length === 0) return null;
+        
+        // Special case: skills/hobbies/etc should use "Having"
+        if (['skills', 'hobbies', 'interests', 'tags', 'languages', 'items'].includes(key)) {
+          const items = value.map(item => {
+            const str = String(item);
+            // Capitalize first letter
+            return str.charAt(0).toUpperCase() + str.slice(1);
+          }).join(", ");
+          return `Having ${items}`;
+        }
+        
+        // For other arrays, just list the items
+        const items = value.map(item => toNatural(item, depth + 1)).join(", ");
+        return `${naturalKey}: ${items}`;
+      }
+
+      // Handle primitives with context
+      const naturalValue = toNatural(value, depth + 1);
+
+      if (naturalValue === "yes") return `${naturalKey} enabled`;
+      if (naturalValue === "no") return `${naturalKey} disabled`;
+
+      // Special patterns
+      if (key === 'theme') return `prefers the ${naturalValue} ${key}`;
+      if (key === 'age') return `age: ${naturalValue}`;
+      if (key === 'email') return `email: ${naturalValue}`;
+      if (key === 'city') return `address: ${naturalValue}`;
+      if (key === 'debug' && naturalValue === "yes") return `debug enabled`;
+
+      return `${naturalKey}: ${naturalValue}`;
+    }
+
+    function camelToWords(str) {
+      return str
+        .replace(/([A-Z])/g, " $1")
+        .toLowerCase()
+        .trim();
+    }
+
+    // === ANALYZE: Get JSON analysis ===
+    function analyze(obj) {
+      const stats = {
+        originalSize: JSON.stringify(obj).length,
+        arrays: 0,
+        objects: 0,
+        strings: 0,
+        numbers: 0,
+        booleans: 0,
+        nullValues: 0,
+        depth: 0,
+        keys: 0
+      };
+
+      function traverse(o, depth = 1) {
+        stats.depth = Math.max(stats.depth, depth);
+        if (o === null) {
+          stats.nullValues++;
+          return;
+        }
+        if (Array.isArray(o)) {
+          stats.arrays++;
+          o.forEach(item => traverse(item, depth + 1));
+        } else if (typeof o === 'object') {
+          stats.objects++;
+          Object.entries(o).forEach(([key, value]) => {
+            stats.keys++;
+            traverse(value, depth + 1);
+          });
+        } else if (typeof o === 'string') {
+          stats.strings++;
+        } else if (typeof o === 'number') {
+          stats.numbers++;
+        } else if (typeof o === 'boolean') {
+          stats.booleans++;
+        }
+      }
+
+      traverse(obj);
+
+      return `📊 JSON Analysis Report
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Structure:
+  • Objects: ${stats.objects}
+  • Arrays: ${stats.arrays}
+  • Total Keys: ${stats.keys}
+  • Max Depth: ${stats.depth}
+
+Types:
+  • Strings: ${stats.strings}
+  • Numbers: ${stats.numbers}
+  • Booleans: ${stats.booleans}
+  • Null Values: ${stats.nullValues}
+
+Size:
+  • Original Size: ${stats.originalSize} bytes
+  • Estimated Tokens: ~${Math.ceil(stats.originalSize / 4)}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+    }
+
+    // ========== UI FUNCTIONS ==========
+
+    function getInputJSON() {
+      const input = document.getElementById('jsonInput').value.trim();
+      if (!input) {
+        showError('Please enter some JSON');
+        return null;
+      }
+      if (!isValidJSON(input)) {
+        showError('Invalid JSON format');
+        return null;
+      }
+      return parseJSON(input);
+    }
+
+    function processAndDisplay() {
+      const json = getInputJSON();
+      if (!json) return;
+
+      try {
+        // Analyze
+        const analysisResult = analyze(json);
+        const analysisText = typeof analysisResult === 'string' ? analysisResult : JSON.stringify(analysisResult, null, 2);
+        document.getElementById('analyzeOutput').textContent = analysisText;
+
+        // Compact
+        const compacted = compact(json);
+        const compactedText = typeof compacted === 'string' ? compacted : JSON.stringify(compacted, null, 2);
+        document.getElementById('compactOutput').textContent = compactedText;
+
+        // Flatten
+        const flattened = flatten(json);
+        document.getElementById('flattenOutput').textContent = JSON.stringify(flattened, null, 2);
+
+        // Prune
+        const pruned = prune(json, { removeKeys: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] });
+        document.getElementById('pruneOutput').textContent = JSON.stringify(pruned, null, 2);
+
+        // Natural Language
+        const natural = toNatural(json);
+        document.getElementById('naturalOutput').textContent = natural;
+
+        // TOON
+        const toon = toTOON(json);
+        document.getElementById('toonOutput').textContent = toon;
+
+        clearError();
+      } catch (e) {
+        showError(`Error: ${e.message}`);
+      }
+    }
+
+    function showTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+
+      // Process if needed
+      processAndDisplay();
+    }
+
+    function copyOutput(elementId) {
+      const element = document.getElementById(elementId);
+      const text = element.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const original = btn.textContent;
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => {
+          btn.textContent = original;
+        }, 2000);
+      });
+    }
+
+    function loadExample() {
+      const example = {
+        user: {
+          id: '12345',
+          name: 'Alice Johnson',
+          email: 'alice@example.com',
+          profile: {
+            theme: 'dark',
+            notifications: true,
+            createdAt: '2024-01-01',
+            updatedAt: '2024-01-15'
+          }
+        },
+        debug: true,
+        internal: {
+          apiKey: 'secret-key'
+        },
+        metadata: {
+          version: '1.0',
+          timestamp: 1234567890
+        }
+      };
+      document.getElementById('jsonInput').value = JSON.stringify(example, null, 2);
+      processAndDisplay();
+    }
+
+    function clearInput() {
+      document.getElementById('jsonInput').value = '';
+      document.querySelectorAll('.output-box').forEach(box => {
+        box.textContent = 'Enter valid JSON to see output';
+      });
+    }
+
+    function showError(msg) {
+      const containers = document.querySelectorAll('.output-box');
+      const error = `<div class="error">❌ ${msg}</div>`;
+      containers.forEach(box => box.innerHTML = error);
+    }
+
+    function clearError() {
+      const errors = document.querySelectorAll('.error');
+      errors.forEach(e => e.remove());
+    }
+
+    // ========== EVENT LISTENERS ==========
+
+    const input = document.getElementById('jsonInput');
+    input.addEventListener('input', processAndDisplay);
+    input.addEventListener('change', processAndDisplay);
+
+    // Load example on page load
+    window.addEventListener('load', () => {
+      loadExample();
+    });
+  </script>
+
+</body>
+</html>
