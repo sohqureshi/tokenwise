@@ -3,7 +3,50 @@
   "version": "1.0.0",
   "description": "Optimize JSON data for AI by reducing token usage",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./core/analyze": {
+      "types": "./dist/core/analyze.d.ts",
+      "import": "./dist/core/analyze.js",
+      "require": "./dist/core/analyze.cjs"
+    },
+    "./core/compact": {
+      "types": "./dist/core/compact.d.ts",
+      "import": "./dist/core/compact.js",
+      "require": "./dist/core/compact.cjs"
+    },
+    "./core/flatten": {
+      "types": "./dist/core/flatten.d.ts",
+      "import": "./dist/core/flatten.js",
+      "require": "./dist/core/flatten.cjs"
+    },
+    "./core/natural": {
+      "types": "./dist/core/natural.d.ts",
+      "import": "./dist/core/natural.js",
+      "require": "./dist/core/natural.cjs"
+    },
+    "./core/prune": {
+      "types": "./dist/core/prune.d.ts",
+      "import": "./dist/core/prune.js",
+      "require": "./dist/core/prune.cjs"
+    },
+    "./core/token": {
+      "types": "./dist/core/token.d.ts",
+      "import": "./dist/core/token.js",
+      "require": "./dist/core/token.cjs"
+    },
+    "./core/toon": {
+      "types": "./dist/core/toon.d.ts",
+      "import": "./dist/core/toon.js",
+      "require": "./dist/core/toon.cjs"
+    }
+  },
   "bin": {
     "tokenwise": "./dist/cli.js"
   },
@@ -11,7 +54,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts src/cli.ts src/core/analyze.ts src/core/compact.ts src/core/flatten.ts src/core/natural.ts src/core/prune.ts src/core/token.ts src/core/toon.ts --format esm,cjs --dts",
     "test": "vitest",
     "prepare": "npm run build"
   },
