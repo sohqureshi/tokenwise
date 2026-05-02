@@ -2,6 +2,14 @@
 
 TokenWise is a lightweight utility for preparing JSON before sending it to AI models. It helps reduce payload noise, shrink token usage, and turn structured data into formats that are easier for LLMs to consume.
 
+
+![npm version](https://img.shields.io/npm/v/tokenwise)
+![downloads](https://img.shields.io/npm/dw/tokenwise)
+![license](https://img.shields.io/github/license/sohqureshi/tokenwise)
+![stars](https://img.shields.io/github/stars/sohqureshi/tokenwise?style=social)
+[![Demo](https://img.shields.io/badge/Live%20Demo-Visit-brightgreen)](https://sohqureshi.github.io/tokenwise/)
+[![Support](https://img.shields.io/badge/❤️%20Support%20Tokenwise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
+
 ---
 
 ## 🧠 What is tokenwise?
@@ -247,12 +255,6 @@ If it helps you, consider supporting its development:
 [![Support](https://img.shields.io/badge/❤️%20Support%20TokenWise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
 
 
-![npm version](https://img.shields.io/npm/v/tokenwise)
-![downloads](https://img.shields.io/npm/dw/tokenwise)
-![license](https://img.shields.io/github/license/sohqureshi/tokenwise)
-![stars](https://img.shields.io/github/stars/sohqureshi/tokenwise?style=social)
-[![Demo](https://img.shields.io/badge/Live%20Demo-Visit-brightgreen)](https://sohqureshi.github.io/tokenwise/)
-[![Support](https://img.shields.io/badge/❤️%20Support%20Tokenwise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
 ---
 
 ## 💡 Vision
