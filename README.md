@@ -33,7 +33,7 @@ Raw JSON is:
 ## Installation
 
 ```bash
-npm install tokenwise
+npm install @sohqureshi/tokenwise
 ```
 
 ## Quick Usage
