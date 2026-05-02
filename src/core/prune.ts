@@ -6,17 +6,23 @@ type PruneOptions = {
   removeEmptyArrays?: boolean;
 };
 
+type PruneInput = PruneOptions | string[];
+
 export function prune(
   obj: any,
-  options: PruneOptions = {}
+  options: PruneInput = {}
 ): any {
+  const normalizedOptions: PruneOptions = Array.isArray(options)
+    ? { removeKeys: options }
+    : options;
+
   const {
     removeKeys = [],
     removeNull = true,
     removeUndefined = true,
     removeEmptyObjects = true,
     removeEmptyArrays = false,
-  } = options;
+  } = normalizedOptions;
 
   // Primitive values → return as is
   if (obj === null) return removeNull ? undefined : obj;
@@ -26,7 +32,7 @@ export function prune(
   // Array handling
   if (Array.isArray(obj)) {
     const arr = obj
-      .map((item) => prune(item, options))
+      .map((item) => prune(item, normalizedOptions))
       .filter((item) => item !== undefined);
 
     if (removeEmptyArrays && arr.length === 0) {
@@ -42,7 +48,7 @@ export function prune(
   for (const key in obj) {
     if (removeKeys.includes(key)) continue;
 
-    const value = prune(obj[key], options);
+    const value = prune(obj[key], normalizedOptions);
 
     if (value === undefined) continue;
 

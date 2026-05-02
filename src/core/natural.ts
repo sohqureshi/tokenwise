@@ -32,11 +32,16 @@ export function toNatural(data: any, depth: number = 0): string {
 
   if (Array.isArray(data)) {
     if (data.length === 0) return "empty list";
+
+    if (data.every(isPlainObject)) {
+      return data
+        .map((item, index) => `${index + 1}. ${stripTrailingPeriod(toNatural(item, depth + 1))}.`)
+        .join(" ");
+    }
+
     // Join array items with proper grammar
     const items = data.map((item) => toNatural(item, depth + 1));
-    if (items.length === 1) return items[0];
-    const lastItem = items.pop();
-    return items.join(", ") + " and " + lastItem;
+    return joinNaturalList(items);
   }
 
   if (typeof data === 'object') {
@@ -113,6 +118,10 @@ function formatPropertyClause(key: string, value: any, depth: number): string | 
     const nested = Object.entries(value)
       .filter(([k]) => !['id', 'timestamp', 'apiKey', 'createdAt', 'updatedAt'].includes(k))
       .map(([k, v]) => {
+        if (typeof v === 'object' && v !== null) {
+          return formatPropertyClause(k, v, depth + 1);
+        }
+
         const propValue = toNatural(v, depth + 1);
         if (propValue === "yes" || propValue === "no") {
           return `${camelToWords(k)} ${propValue === "yes" ? "enabled" : "disabled"}`;
@@ -140,13 +149,12 @@ function formatPropertyClause(key: string, value: any, depth: number): string | 
           const str = String(item);
           // Capitalize first letter
           return str.charAt(0).toUpperCase() + str.slice(1);
-        })
-        .join(", ");
-      return `Having ${items}`;
+        });
+      return `Having ${joinNaturalList(items)}`;
     }
 
     // For other arrays, just list the items
-    const items = value.map((item) => toNatural(item, depth + 1)).join(", ");
+    const items = joinNaturalList(value.map((item) => toNatural(item, depth + 1)));
     return `${naturalKey}: ${items}`;
   }
 
@@ -174,4 +182,21 @@ function camelToWords(str: string): string {
     .replace(/([A-Z])/g, " $1")
     .toLowerCase()
     .trim();
+}
+
+function isPlainObject(value: any): value is Record<string, any> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function joinNaturalList(items: string[]): string {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+
+  const lastItem = items[items.length - 1];
+  return `${items.slice(0, -1).join(", ")} and ${lastItem}`;
+}
+
+function stripTrailingPeriod(value: string): string {
+  return value.replace(/\.+$/, "");
 }

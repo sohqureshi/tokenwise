@@ -27,7 +27,7 @@ export function analyze(input: any, options: any = {}) {
   let optimizedData = input;
 
   if (options.prune && Array.isArray(options.prune)) {
-    optimizedData = prune(optimizedData);
+    optimizedData = prune(optimizedData, options.prune);
   }
 
   if (options.compact) {

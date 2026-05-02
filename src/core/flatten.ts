@@ -1,5 +1,5 @@
 /**
- * Flattens nested JSON into key-value pairs using dot notation.
+ * Flattens nested JSON into an object with dot-notation keys.
  *
  * Useful for:
  * - Search indexing
@@ -7,11 +7,11 @@
  *
  * @param obj - Input object
  * @param prefix - Used internally for recursion
- * @returns Array of flattened key=value strings
+ * @returns Object with dot-notation keys
  *
  * Example:
  * flatten({ user: { name: "Ali" } })
- * → ["user.name=Ali"]
+ * -> { "user.name": "Ali" }
  */
 export function flatten(obj: any, prefix = '', res: any = {}) {
   if (obj === null || obj === undefined) return res

@@ -1,14 +1,6 @@
-# Tokenwise
+# TokenWise
 
-![npm version](https://img.shields.io/npm/v/tokenwise)
-![downloads](https://img.shields.io/npm/dw/tokenwise)
-![license](https://img.shields.io/github/license/sohqureshi/tokenwise)
-![stars](https://img.shields.io/github/stars/sohqureshi/tokenwise?style=social)
-[![Demo](https://img.shields.io/badge/Live%20Demo-Visit-brightgreen)](https://sohqureshi.github.io/tokenwise/)
-[![Support](https://img.shields.io/badge/❤️%20Support%20Tokenwise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
-
-
-> Stop sending raw JSON to LLMs. Optimize first. Save tokens. Save money.
+TokenWise is a lightweight utility for preparing JSON before sending it to AI models. It helps reduce payload noise, shrink token usage, and turn structured data into formats that are easier for LLMs to consume.
 
 ---
 
@@ -30,109 +22,179 @@ Raw JSON is:
 
 ---
 
-## 🔥 Example
-
-### Input (Raw JSON)
-
-```json
-{
-  "user": {
-    "id": "123",
-    "name": "Ali",
-    "createdAt": "2024-01-01"
-  }
-}
-```
-
-### Output (Optimized)
-
-```
-Ali
-```
-
-👉 Reduced unnecessary data → fewer tokens → lower cost
-
----
-
-## 📦 Installation
+## Installation
 
 ```bash
 npm install tokenwise
 ```
 
----
-
-## ⚡ Usage
+## Quick Usage
 
 ```js
-import ai from "tokenwise";
+import ai, { compact, flatten, toNatural, toTOON } from "tokenwise";
 
-const data = {
-  Person: [
-    { Name: "Ali", Age: 11 },
-    { Name: "John", Age: 12 }
-  ]
+const product = {
+  product: {
+    name: "Wireless Headphones",
+    price: 79.99
+  }
 };
 
-const result = ai(data)
-  .prune(["id", "createdAt"])
-  .compact()
-  .value();
+console.log(compact(product));
+// {"product":{"name":"Wireless Headphones","price":79.99}}
 
-console.log(result);
-// Output: [Ali,11];[John,12]
+console.log(flatten(product));
+// {
+//   "product.name": "Wireless Headphones",
+//   "product.price": 79.99
+// }
+
+console.log(ai(product).compact().value());
+// {"product":{"name":"Wireless Headphones","price":79.99}}
 ```
 
----
+## Core Functions
 
-## ✨ Features
+### `prune()`
 
-* 🔹 **prune()** → Remove unnecessary fields
-* 🔹 **compact()** → Compress structure
-* 🔹 **flatten()** → Flatten nested objects
-* 🔹 **toNatural()** → Convert to AI-friendly text
-* 🔹 **tokenEstimate()** → Estimate token usage
-* 🔹 **visualizeTokens()** → Interactive token usage visualization (CLI/Web support planned).
+Removes fields you do not want to send to the model. By default it also removes `null`, `undefined`, and empty objects.
 
----
+```js
+import { prune } from "tokenwise";
 
-## 📊 Why it matters
+const input = {
+  user: { name: "John", age: 28 },
+  debug: true,
+  internal: { apiKey: "secret" }
+};
 
-LLMs charge per token.
+console.log(prune(input, ["debug", "internal"]));
+// { user: { name: "John", age: 28 } }
+```
 
-More tokens = more cost 💸
+### `compact()`
 
-**tokenwise** helps reduce token usage by **30–60%** by:
+Prunes empty/noisy values, then returns minified JSON.
 
-* removing redundant data
-* simplifying structure
-* improving input clarity
+```js
+compact({
+  product: {
+    name: "Wireless Headphones",
+    price: 79.99
+  }
+});
+// {"product":{"name":"Wireless Headphones","price":79.99}}
+```
 
----
+### `flatten()`
 
-## 🧩 Use Cases
+Converts nested objects and arrays into one object with dot-notation keys.
 
-* AI chatbots
-* Prompt optimization
-* API cost reduction
-* Data preprocessing for LLMs
-* LLM pipelines and workflows
-* Bulk LLM token estimation
+```js
+flatten({
+  policy: {
+    claims: [
+      { status: "approved", amount: 1200 },
+      { status: "pending", amount: 500 }
+    ]
+  }
+});
+// {
+//   "policy.claims.0.status": "approved",
+//   "policy.claims.0.amount": 1200,
+//   "policy.claims.1.status": "pending",
+//   "policy.claims.1.amount": 500
+// }
+```
 
----
+### `toNatural()`
 
-## ⚡ Token Savings
+Converts JSON into readable sentences or numbered pointers.
 
-- **JSON Tokens:** 169  
-- **TOON Tokens:** 86  
+```js
+toNatural([
+  {
+    user: {
+      name: "Alice Johnson",
+      email: "alice@example.com",
+      skills: ["Python", "JavaScript"]
+    }
+  }
+]);
+// 1. User Alice Johnson (email: alice@example.com, Having Python and JavaScript).
+```
 
-👉 **Saved:** 49%
+Medical and insurance-style data also becomes readable:
 
----
+```js
+toNatural({
+  policy: {
+    holderName: "Carlos Rivera",
+    policyNumber: "HLT-2048",
+    claim: {
+      status: "under review",
+      requestedAmount: 64000
+    }
+  }
+});
+// policy: holder name Carlos Rivera, policy number HLT-2048, claim: status under review, requested amount 64000.
+```
 
-## 🖥️ Focus on *CLI Value*
+### `toTOON()`
 
-Run TokenWise locally
+Converts JSON into a compact TOON-like text format. Arrays of objects become table-style rows.
+
+```js
+toTOON({
+  users: [
+    { id: 1, name: "Ali" },
+    { id: 2, name: "John" }
+  ]
+});
+// users:
+//   [2]{id,name}:
+//     1,Ali
+//     2,John
+```
+
+If later rows contain extra keys, the schema includes them:
+
+```js
+toTOON({
+  claims: [
+    { id: "C-1", status: "approved" },
+    { id: "C-2", amount: 500 }
+  ]
+});
+// claims:
+//   [2]{id,status,amount}:
+//     C-1,approved,
+//     C-2,,500
+```
+
+## Tested Use Cases
+
+TokenWise currently has coverage for:
+
+- Product JSON minification
+- Dot-notation flattening
+- Arrays and arrays of objects
+- Medical patient and appointment data
+- Insurance policy and claim data
+- Natural-language user pointers
+- TOON table formatting
+- Null, undefined, and empty values
+
+## Why It Helps
+
+LLMs charge and reason over tokens. Sending raw JSON often includes repeated keys, unnecessary metadata, and formatting whitespace. TokenWise gives you multiple ways to reshape the same data depending on your prompt:
+
+- Use `compact()` when you need valid JSON with minimal whitespace.
+- Use `flatten()` when retrieval, search, or simple key-value context is better.
+- Use `toNatural()` when the model should read the data like human-friendly notes.
+- Use `toTOON()` when arrays of objects should be shorter than repeated JSON.
+
+## CLI
 
 ```bash
 node demo.js
@@ -184,6 +246,13 @@ If it helps you, consider supporting its development:
 
 [![Support](https://img.shields.io/badge/❤️%20Support%20TokenWise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
 
+
+![npm version](https://img.shields.io/npm/v/tokenwise)
+![downloads](https://img.shields.io/npm/dw/tokenwise)
+![license](https://img.shields.io/github/license/sohqureshi/tokenwise)
+![stars](https://img.shields.io/github/stars/sohqureshi/tokenwise?style=social)
+[![Demo](https://img.shields.io/badge/Live%20Demo-Visit-brightgreen)](https://sohqureshi.github.io/tokenwise/)
+[![Support](https://img.shields.io/badge/❤️%20Support%20Tokenwise-View-black?style=for-the-badge)](https://github.com/sponsors/sohqureshi)
 ---
 
 ## 💡 Vision

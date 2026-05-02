@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="TokenWise Demo - Interactive tool to optimize JSON and visualize token usage." />
+  <meta name="description" content="TokenWise Demo - Interactive tool to prune, compact, flatten, naturalize, and convert JSON to TOON-like context." />
   <title>TokenWise Demo | Interactive JSON Optimizer</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -348,19 +348,21 @@
         </div>
         <div class="input-group">
           <textarea id="jsonInput" placeholder='{
-  "user": {
-    "id": "12345",
-    "name": "Alice Johnson",
-    "email": "alice@example.com",
-    "profile": {
-      "theme": "dark",
-      "notifications": true,
-      "createdAt": "2024-01-01"
-    }
+  "product": {
+    "name": "Wireless Headphones",
+    "price": 79.99
   },
-  "debug": true,
-  "metadata": {
-    "version": "1.0"
+  "users": [
+    { "id": 1, "name": "Ali" },
+    { "id": 2, "name": "John" }
+  ],
+  "policy": {
+    "holderName": "Carlos Rivera",
+    "policyNumber": "HLT-2048",
+    "claim": {
+      "status": "under review",
+      "requestedAmount": 64000
+    }
   }
 }'></textarea>
           <div class="buttons">
@@ -395,14 +397,14 @@
 
         <!-- Compact Tab -->
         <div id="compact" class="tab-content">
-          <div class="info-box">Compress structure intelligently without losing semantic meaning.</div>
+          <div class="info-box">Return minified JSON after pruning null, undefined, and empty object values.</div>
           <div class="output-box" id="compactOutput">Enter valid JSON to compact</div>
           <button class="copy-btn" onclick="copyOutput('compactOutput')">📋 Copy Output</button>
         </div>
 
         <!-- Flatten Tab -->
         <div id="flatten" class="tab-content">
-          <div class="info-box">Flatten deeply nested objects into clean, AI-readable structures.</div>
+          <div class="info-box">Flatten nested objects and arrays into dot-notation key-value objects.</div>
           <div class="output-box" id="flattenOutput">Enter valid JSON to flatten</div>
           <button class="copy-btn" onclick="copyOutput('flattenOutput')">📋 Copy Output</button>
         </div>
@@ -423,7 +425,7 @@
 
         <!-- TOON Tab -->
         <div id="toon" class="tab-content">
-          <div class="info-box">Convert your JSON data to TOON (Text Object Object Notation) format</div>
+          <div class="info-box">Convert JSON to TOON-like compact text; arrays of objects become table-style rows.</div>
           <div class="output-box" id="toonOutput">Enter valid JSON to convert</div>
           <button class="copy-btn" onclick="copyOutput('toonOutput')">📋 Copy Output</button>
         </div>
@@ -460,7 +462,7 @@
     // === PRUNE: Remove unnecessary fields ===
     function prune(obj, options = {}) {
       const {
-        removeKeys = ['id', 'debug', 'internal', 'createdAt', 'updatedAt'],
+        removeKeys = [],
         removeNull = true,
         removeUndefined = true,
         removeEmptyObjects = true,
@@ -512,29 +514,58 @@
 
     // === COMPACT: Minify JSON ===
     function compact(obj) {
-      return JSON.stringify(obj);
+      return JSON.stringify(prune(obj)) || "";
     }
 
     // === TOON: Convert to TOON format ===
     function toTOON(data, indent = 0) {
       const space = "  ".repeat(indent);
+
       if (Array.isArray(data)) {
         if (data.length === 0) return "[]";
-        if (typeof data[0] === 'object' && data[0] !== null) {
-          const keys = Object.keys(data[0]);
-          const values = data.map(item => 
-            keys.map(k => `${item[k] !== null ? item[k] : 'null'}`).join(',')
-          ).join('\n' + space);
-          return `${keys.join(',')}\n${space}${values}`;
+
+        if (data.every(isPlainObject)) {
+          const keys = Array.from(new Set(data.flatMap(item => Object.keys(item))));
+          let result = `${space}[${data.length}]{${keys.join(",")}}:\n`;
+
+          for (const item of data) {
+            result += space + "  " + keys.map(k => formatToonValue(item[k])).join(",") + "\n";
+          }
+
+          return result;
         }
-        return "[\n" + space + "  " + data.map((item, i) => `[${i}] ${toTOON(item, indent + 1).trim()}`).join("\n" + space + "  ") + "\n" + space + "]";
+
+        return `${space}[${data.length}]: ${data.join(",")}`;
       }
-      if (data === null) return "null";
-      if (typeof data === 'string') return `"${data}"`;
-      if (typeof data !== 'object') return String(data);
-      
-      const entries = Object.entries(data).map(([k, v]) => `${space}  ${k}: ${toTOON(v, indent + 1).trim()}`).join('\n');
-      return entries ? `{\n${entries}\n${space}}` : "{}";
+
+      if (typeof data === "object" && data !== null) {
+        let result = "";
+
+        for (const key in data) {
+          const value = data[key];
+
+          if (typeof value === "object" && value !== null) {
+            result += `${space}${key}:\n${toTOON(value, indent + 1)}\n`;
+          } else {
+            const formatted = formatToonValue(value);
+            result += formatted ? `${space}${key}: ${formatted}\n` : `${space}${key}:\n`;
+          }
+        }
+
+        return result.trim();
+      }
+
+      return formatToonValue(data);
+    }
+
+    function formatToonValue(value) {
+      if (value === null || value === undefined) return "";
+      if (typeof value === "string") return value;
+      return String(value);
+    }
+
+    function isPlainObject(value) {
+      return typeof value === "object" && value !== null && !Array.isArray(value);
     }
 
     // === TO_NATURAL: Convert to natural language story with context ===
@@ -546,11 +577,16 @@
       
       if (Array.isArray(data)) {
         if (data.length === 0) return "empty list";
+
+        if (data.every(isPlainObject)) {
+          return data
+            .map((item, index) => `${index + 1}. ${stripTrailingPeriod(toNatural(item, depth + 1))}.`)
+            .join(" ");
+        }
+
         // Join array items with proper grammar
         const items = data.map(item => toNatural(item, depth + 1));
-        if (items.length === 1) return items[0];
-        const lastItem = items.pop();
-        return items.join(", ") + " and " + lastItem;
+        return joinNaturalList(items);
       }
       
       if (typeof data === 'object') {
@@ -584,7 +620,7 @@
       const clauses = entries
         .map(([key, value]) => {
           // If this is a 'user' object and we already used the name, extract its properties
-          if (key === 'user' && name) {
+          if (key === 'user' && name && typeof value === 'object' && value !== null && !Array.isArray(value)) {
             const userProps = Object.entries(value)
               .filter(([k]) => !['id', 'name', 'timestamp', 'apiKey'].includes(k))
               .map(([k, v]) => formatPropertyClause(k, v, depth + 1))
@@ -621,6 +657,10 @@
         const nested = Object.entries(value)
           .filter(([k]) => !['id', 'timestamp', 'apiKey', 'createdAt', 'updatedAt'].includes(k))
           .map(([k, v]) => {
+            if (typeof v === 'object' && v !== null) {
+              return formatPropertyClause(k, v, depth + 1);
+            }
+
             const propValue = toNatural(v, depth + 1);
             if (propValue === "yes" || propValue === "no") {
               return `${camelToWords(k)} ${propValue === "yes" ? "enabled" : "disabled"}`;
@@ -645,12 +685,12 @@
             const str = String(item);
             // Capitalize first letter
             return str.charAt(0).toUpperCase() + str.slice(1);
-          }).join(", ");
-          return `Having ${items}`;
+          });
+          return `Having ${joinNaturalList(items)}`;
         }
         
         // For other arrays, just list the items
-        const items = value.map(item => toNatural(item, depth + 1)).join(", ");
+        const items = joinNaturalList(value.map(item => toNatural(item, depth + 1)));
         return `${naturalKey}: ${items}`;
       }
 
@@ -675,6 +715,19 @@
         .replace(/([A-Z])/g, " $1")
         .toLowerCase()
         .trim();
+    }
+
+    function joinNaturalList(items) {
+      if (items.length === 0) return "";
+      if (items.length === 1) return items[0];
+      if (items.length === 2) return `${items[0]} and ${items[1]}`;
+
+      const lastItem = items[items.length - 1];
+      return `${items.slice(0, -1).join(", ")} and ${lastItem}`;
+    }
+
+    function stripTrailingPeriod(value) {
+      return value.replace(/\.+$/, "");
     }
 
     // === ANALYZE: Get JSON analysis ===
@@ -858,24 +911,21 @@ Size:
 
     function loadExample() {
       const example = {
-        user: {
-          id: '12345',
-          name: 'Alice Johnson',
-          email: 'alice@example.com',
-          profile: {
-            theme: 'dark',
-            notifications: true,
-            createdAt: '2024-01-01',
-            updatedAt: '2024-01-15'
+        product: {
+          name: 'Wireless Headphones',
+          price: 79.99
+        },
+        users: [
+          { id: 1, name: 'Ali' },
+          { id: 2, name: 'John' }
+        ],
+        policy: {
+          holderName: 'Carlos Rivera',
+          policyNumber: 'HLT-2048',
+          claim: {
+            status: 'under review',
+            requestedAmount: 64000
           }
-        },
-        debug: true,
-        internal: {
-          apiKey: 'secret-key'
-        },
-        metadata: {
-          version: '1.0',
-          timestamp: 1234567890
         }
       };
       document.getElementById('jsonInput').value = JSON.stringify(example, null, 2);

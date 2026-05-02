@@ -35,6 +35,20 @@ describe('analyze()', () => {
     expect(result.originalTokens).not.toBeNaN();
     expect(result.optimizedTokens).not.toBeNaN();
   });
+
+  it('should pass prune keys to optimized data', () => {
+    const input = {
+      user: { name: "John", age: 28 },
+      debug: true,
+      internal: { apiKey: "secret" }
+    };
+
+    const result = analyze(input, { prune: ["debug", "internal"] });
+
+    expect(result.optimizedData).toEqual({
+      user: { name: "John", age: 28 }
+    });
+  });
  
 // testing handle empty input-
   it('should handle empty input gracefully', () => {

@@ -65,6 +65,38 @@ describe('toTOON', () => {
     expect(output).toContain('name')
   })
 
+  it('should output exact table format for array of objects', () => {
+    const input = {
+      users: [
+        { id: 1, name: "Ali" },
+        { id: 2, name: "John" }
+      ]
+    }
+
+    expect(toTOON(input)).toBe(
+      "users:\n  [2]{id,name}:\n    1,Ali\n    2,John"
+    )
+  })
+
+  it('should include later object keys in array schema', () => {
+    const input = {
+      claims: [
+        { id: "C-1", status: "approved" },
+        { id: "C-2", amount: 500 }
+      ]
+    }
+
+    expect(toTOON(input)).toBe(
+      "claims:\n  [2]{id,status,amount}:\n    C-1,approved,\n    C-2,,500"
+    )
+  })
+
+  it('should output exact primitive array format', () => {
+    expect(toTOON({ items: ["apple", "banana", "orange"] })).toBe(
+      "items:\n  [3]: apple,banana,orange"
+    )
+  })
+
   it('should handle mixed data types', () => {
     const input = {
       str: "hello",
@@ -89,6 +121,11 @@ describe('toTOON', () => {
 
     // adjust based on your prune/handling logic
     expect(output).not.toContain('undefined')
+    expect(output).toBe("a:\nb:")
+  })
+
+  it('should handle empty arrays', () => {
+    expect(toTOON({ items: [] })).toBe("items:\n[]")
   })
 
   it('should handle empty object', () => {

@@ -27,9 +27,11 @@ export function toTOON(data: any, indent = 0): string {
   if (Array.isArray(data)) {
     if (data.length === 0) return "[]";
 
-    // Extract schema from first object
-    if (typeof data[0] === "object") {
-      const keys = Object.keys(data[0]);
+    // Extract schema from object rows
+    if (data.every(isPlainObject)) {
+      const keys = Array.from(
+        new Set(data.flatMap((item) => Object.keys(item)))
+      );
 
       let result = `${space}[${data.length}]{${keys.join(",")}}:\n`;
 
@@ -55,10 +57,13 @@ export function toTOON(data: any, indent = 0): string {
     for (const key in data) {
       const value = data[key];
 
-      if (typeof value === "object") {
+      if (typeof value === "object" && value !== null) {
         result += `${space}${key}:\n${toTOON(value, indent + 1)}\n`;
       } else {
-        result += `${space}${key}: ${formatValue(value)}\n`;
+        const formatted = formatValue(value);
+        result += formatted
+          ? `${space}${key}: ${formatted}\n`
+          : `${space}${key}:\n`;
       }
     }
 
@@ -75,4 +80,8 @@ function formatValue(val: any): string {
   if (val === null || val === undefined) return "";
   if (typeof val === "string") return val;
   return String(val);
+}
+
+function isPlainObject(value: any): value is Record<string, any> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

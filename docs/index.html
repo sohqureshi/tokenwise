@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="TokenWise - Optimize JSON for LLMs. Prune, compact, flatten, convert to natural language, estimate tokens, and visualize token usage to reduce LLM API costs dramatically." />
-  <meta name="keywords" content="TokenWise, LLM token optimization, reduce token usage, JSON prune, flatten JSON for AI, token estimator, LLM cost reduction, AI developer tools" />
+  <meta name="description" content="TokenWise - Optimize JSON for LLMs. Prune, compact, flatten, convert to natural language, generate TOON, and analyze token savings." />
+  <meta name="keywords" content="TokenWise, LLM token optimization, reduce token usage, JSON prune, JSON compact, flatten JSON for AI, TOON format, LLM cost reduction, AI developer tools" />
   <meta name="author" content="Mohammad Sohail Qureshi" />
 
   <!-- Open Graph / Social -->
   <meta property="og:title" content="TokenWise | Smart JSON Optimization for Lower LLM Token Costs" />
-  <meta property="og:description" content="Prune, compact, flatten JSON and visualize tokens to cut LLM API expenses. Essential toolkit for AI developers." />
+  <meta property="og:description" content="Prune, compact, flatten JSON, generate natural language, and convert arrays to TOON-style context for LLM prompts." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://sohqureshi.github.io/tokenwise/" />
   <meta property="og:image" content="https://sohqureshi.github.io/tokenwise/og-image.png" /> <!-- Add your image later if needed -->
@@ -259,7 +259,7 @@
       <h1>TokenWise</h1>
       <p class="subtitle">
         The smart toolkit to optimize JSON for Large Language Models.<br>
-        Prune, compact, flatten, convert, estimate, and visualize tokens — all in one place.
+        Prune, compact, flatten, convert to natural language, and generate TOON-style context in one place.
       </p>
     </header>
   </div>
@@ -278,13 +278,13 @@
       <div class="card">
         <div class="icon">📦</div>
         <div class="title">compact()</div>
-        <div class="desc">Compress structure intelligently without losing semantic meaning.</div>
+        <div class="desc">Return minified JSON after removing null, undefined, and empty object values.</div>
       </div>
 
       <div class="card">
         <div class="icon">📏</div>
         <div class="title">flatten()</div>
-        <div class="desc">Flatten deeply nested objects into clean, AI-readable structures.</div>
+        <div class="desc">Flatten deeply nested objects and arrays into dot-notation key-value objects.</div>
       </div>
 
       <div class="card">
@@ -295,14 +295,14 @@
 
       <div class="card">
         <div class="icon">🔢</div>
-        <div class="title">tokenEstimate()</div>
-        <div class="desc">Estimate token usage before sending requests to avoid cost surprises.</div>
+        <div class="title">toTOON()</div>
+        <div class="desc">Convert arrays of objects into compact table-style rows for LLM prompts.</div>
       </div>
 
       <div class="card">
         <div class="icon">📊</div>
-        <div class="title">visualizeTokens()</div>
-        <div class="desc">Interactive visualization of token distribution and usage (CLI + Web support planned).</div>
+        <div class="title">analyze()</div>
+        <div class="desc">Compare original and optimized token usage after pruning, compacting, flattening, or TOON conversion.</div>
       </div>
     </div>
 
@@ -369,13 +369,17 @@
           <div>
             <div class="label">Before (Nested)</div>
             <div class="before-after">{
-  "user": { "profile": { "theme": "dark" } }
+  "product": {
+    "name": "Wireless Headphones",
+    "price": 79.99
+  }
 }</div>
           </div>
           <div>
             <div class="label">After (Flattened)</div>
             <div class="before-after">{
-  "user_profile_theme": "dark"
+  "product.name": "Wireless Headphones",
+  "product.price": 79.99
 }</div>
           </div>
         </div>
@@ -390,53 +394,72 @@
         <div class="example-grid">
           <div>
             <div class="label">Before (JSON)</div>
-            <div class="before-after">{
-  "name": "Alice",
-  "theme": "dark"
-}</div>
+            <div class="before-after">[
+  {
+    "user": {
+      "name": "Alice Johnson",
+      "email": "alice@example.com",
+      "skills": ["Python", "JavaScript"]
+    }
+  }
+]</div>
           </div>
           <div>
             <div class="label">After (Natural)</div>
-            <div class="before-after">User Alice prefers the dark theme.</div>
+            <div class="before-after">1. User Alice Johnson (email: alice@example.com, Having Python and JavaScript).</div>
           </div>
         </div>
       </div>
 
-      <!-- tokenEstimate -->
+      <!-- toTOON -->
       <div class="example-card">
         <div class="example-header">
           <span class="icon">🔢</span>
-          <h3>tokenEstimate()</h3>
+          <h3>toTOON()</h3>
         </div>
         <div class="example-grid">
           <div>
-            <div class="label">Input</div>
-            <div class="before-after">The quick brown fox jumps over the lazy dog.</div>
+            <div class="label">Before</div>
+            <div class="before-after">{
+  "users": [
+    { "id": 1, "name": "Ali" },
+    { "id": 2, "name": "John" }
+  ]
+}</div>
           </div>
           <div>
-            <div class="label">Estimated Tokens</div>
-            <div class="before-after">≈ 9 tokens</div>
+            <div class="label">After (TOON)</div>
+            <div class="before-after">users:
+  [2]{id,name}:
+    1,Ali
+    2,John</div>
           </div>
         </div>
       </div>
 
-      <!-- visualizeTokens NEW -->
+      <!-- Insurance use case -->
       <div class="example-card">
         <div class="example-header">
           <span class="icon">📊</span>
-          <h3>visualizeTokens()</h3>
+          <h3>Insurance Use Case</h3>
         </div>
         <div class="example-grid">
           <div>
-            <div class="label">Input Text</div>
-            <div class="before-after">Token optimization helps reduce API costs significantly for large language models.</div>
+            <div class="label">Before</div>
+            <div class="before-after">{
+  "policy": {
+    "holderName": "Carlos Rivera",
+    "policyNumber": "HLT-2048",
+    "claim": {
+      "status": "under review",
+      "requestedAmount": 64000
+    }
+  }
+}</div>
           </div>
           <div>
-            <div class="label">Visualization Output</div>
-            <div class="before-after">Token Distribution:
-• Common words: 12 tokens (low cost)
-• Technical terms: 18 tokens (high impact)
-Total: 30 tokens | Suggested savings: 40%</div>
+            <div class="label">Natural Output</div>
+            <div class="before-after">policy: holder name Carlos Rivera, policy number HLT-2048, claim: status under review, requested amount 64000.</div>
           </div>
         </div>
       </div>
@@ -458,8 +481,8 @@ Total: 30 tokens | Suggested savings: 40%</div>
         <p>A lightweight toolkit that helps AI developers optimize JSON payloads to reduce token consumption and lower LLM API costs.</p>
       </div>
       <div class="faq-item">
-        <div class="faq-question">How does visualizeTokens() help?</div>
-        <p>It shows token distribution and highlights expensive parts of your input so you can optimize before sending requests.</p>
+        <div class="faq-question">What is TOON output?</div>
+        <p>TOON is a compact text format that represents arrays of objects as schema headers and rows, reducing repeated keys in prompt context.</p>
       </div>
       <div class="faq-item">
         <div class="faq-question">Is TokenWise free?</div>
