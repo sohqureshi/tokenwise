@@ -1,6 +1,6 @@
 {
   "name": "@sohqureshi/tokenwise",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Optimize JSON data for AI by reducing token usage",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
