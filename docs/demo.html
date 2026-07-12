@@ -65,6 +65,7 @@
     .header h1 {
       font-size: 2.5rem;
       background: linear-gradient(90deg, var(--primary), var(--secondary));
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 12px;
@@ -241,6 +242,96 @@
       word-break: break-word;
     }
 
+    .result-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .result-card {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .result-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+    }
+
+    .result-card .output-box {
+      max-height: 220px;
+      min-height: 120px;
+    }
+
+    .analysis-box {
+      background: rgba(56, 189, 248, 0.06);
+      border: 1px solid rgba(56, 189, 248, 0.16);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .analysis-highlight {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.16);
+      color: #bbf7d0;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      margin-bottom: 2px;
+    }
+
+    .analysis-highlight.negative {
+      background: rgba(248, 113, 113, 0.14);
+      color: #fecaca;
+      border-color: rgba(248, 113, 113, 0.24);
+    }
+
+    .analysis-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .analysis-meta .meta-pill {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.84rem;
+      color: #e2e8f0;
+    }
+
+    .analysis-meta .meta-pill strong {
+      color: var(--primary);
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.76rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .analysis-box strong {
+      color: var(--primary);
+    }
+
     .stats {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -380,53 +471,127 @@
         </div>
 
         <div class="tab-buttons">
-          <button class="tab-btn active" data-tab="analyze" onclick="showTab('analyze', event)">📊 Analyze</button>
-          <button class="tab-btn" data-tab="compact" onclick="showTab('compact', event)">📦 Compact</button>
-          <button class="tab-btn" data-tab="flatten" onclick="showTab('flatten', event)">📏 Flatten</button>
-          <button class="tab-btn" data-tab="prune" onclick="showTab('prune', event)">✂️ Prune</button>
+          <button class="tab-btn active" data-tab="prune" onclick="showTab('prune', event)">✂️ Prune</button>
           <button class="tab-btn" data-tab="natural" onclick="showTab('natural', event)">💬 Natural</button>
           <button class="tab-btn" data-tab="toon" onclick="showTab('toon', event)">📝 TOON</button>
+          <button class="tab-btn" data-tab="analyze" onclick="showTab('analyze', event)">📊 Analyze</button>
+          <button class="tab-btn" data-tab="compact" onclick="showTab('compact', event)">📦 Compact</button>
+          <button class="tab-btn" data-tab="flatten" onclick="showTab('flatten', event)">📏 Flatten</button>
         </div>
 
         <!-- Analyze Tab -->
-        <div id="analyze" class="tab-content active">
-          <div class="info-box">Analysis of token distribution and usage (CLI + Web support planned).</div>
-          <div class="output-box" id="analyzeOutput">Enter valid JSON to analyze</div>
-          <button class="copy-btn" onclick="copyOutput('analyzeOutput')">📋 Copy Output</button>
+        <div id="analyze" class="tab-content">
+          <div class="info-box">Analyze how your input changes after each optimization step.</div>
+          <div class="result-stack">
+            <div class="result-card">
+              <div class="result-label">Input JSON</div>
+              <div class="output-box" id="analyzeInput">Enter valid JSON to analyze</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Analysis</div>
+              <div class="analysis-box" id="analyzeAnalysis">Enter valid JSON to analyze</div>
+            </div>
+          </div>
+          <button class="copy-btn" onclick="copyOutput('analyzeAnalysis')">📋 Copy Output</button>
         </div>
 
         <!-- Compact Tab -->
         <div id="compact" class="tab-content">
-          <div class="info-box">Return minified JSON after pruning null, undefined, and empty object values.</div>
-          <div class="output-box" id="compactOutput">Enter valid JSON to compact</div>
+          <div class="info-box">See the input JSON, the compacted result, and the estimated savings.</div>
+          <div class="result-stack">
+            <div class="result-card">
+              <div class="result-label">Input JSON</div>
+              <div class="output-box" id="compactInput">Enter valid JSON to compact</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">After (Compact)</div>
+              <div class="output-box" id="compactOutput">Enter valid JSON to compact</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Analysis</div>
+              <div class="analysis-box" id="compactAnalysis">Enter valid JSON to compact</div>
+            </div>
+          </div>
           <button class="copy-btn" onclick="copyOutput('compactOutput')">📋 Copy Output</button>
         </div>
 
         <!-- Flatten Tab -->
         <div id="flatten" class="tab-content">
-          <div class="info-box">Flatten nested objects and arrays into dot-notation key-value objects.</div>
-          <div class="output-box" id="flattenOutput">Enter valid JSON to flatten</div>
+          <div class="info-box">Flatten nested objects into a dot-notation view and compare it against the source payload.</div>
+          <div class="result-stack">
+            <div class="result-card">
+              <div class="result-label">Input JSON</div>
+              <div class="output-box" id="flattenInput">Enter valid JSON to flatten</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">After (Flatten)</div>
+              <div class="output-box" id="flattenOutput">Enter valid JSON to flatten</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Analysis</div>
+              <div class="analysis-box" id="flattenAnalysis">Enter valid JSON to flatten</div>
+            </div>
+          </div>
           <button class="copy-btn" onclick="copyOutput('flattenOutput')">📋 Copy Output</button>
         </div>
 
         <!-- Prune Tab -->
-        <div id="prune" class="tab-content">
-          <div class="info-box">Remove unnecessary fields and reduce payload noise before sending to LLMs.</div>
-          <div class="output-box" id="pruneOutput">Enter valid JSON to prune</div>
+        <div id="prune" class="tab-content active">
+          <div class="info-box">Remove noise such as ids, debug fields, and internal metadata before prompting an LLM.</div>
+          <div class="result-stack">
+            <div class="result-card">
+              <div class="result-label">Input JSON</div>
+              <div class="output-box" id="pruneInput">Enter valid JSON to prune</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">After (Prune)</div>
+              <div class="output-box" id="pruneOutput">Enter valid JSON to prune</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Analysis</div>
+              <div class="analysis-box" id="pruneAnalysis">Enter valid JSON to prune</div>
+            </div>
+          </div>
           <button class="copy-btn" onclick="copyOutput('pruneOutput')">📋 Copy Output</button>
         </div>
 
         <!-- Natural Tab -->
         <div id="natural" class="tab-content">
-          <div class="info-box">Convert your JSON data into natural language descriptions for better LLM understanding.</div>
-          <div class="output-box" id="naturalOutput">Enter valid JSON to convert</div>
+          <div class="info-box">Convert your JSON into natural-language context and compare the length of the original payload with the rewritten version.</div>
+          <div class="result-stack">
+            <div class="result-card">
+              <div class="result-label">Input JSON</div>
+              <div class="output-box" id="naturalInput">Enter valid JSON to convert</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">After (Natural)</div>
+              <div class="output-box" id="naturalOutput">Enter valid JSON to convert</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Analysis</div>
+              <div class="analysis-box" id="naturalAnalysis">Enter valid JSON to convert</div>
+            </div>
+          </div>
           <button class="copy-btn" onclick="copyOutput('naturalOutput')">📋 Copy Output</button>
         </div>
 
         <!-- TOON Tab -->
         <div id="toon" class="tab-content">
-          <div class="info-box">Convert JSON to TOON-like compact text; arrays of objects become table-style rows.</div>
-          <div class="output-box" id="toonOutput">Enter valid JSON to convert</div>
+          <div class="info-box">Turn object arrays into a compact TOON-style layout and inspect how much structure it preserves.</div>
+          <div class="result-stack">
+            <div class="result-card">
+              <div class="result-label">Input JSON</div>
+              <div class="output-box" id="toonInput">Enter valid JSON to convert</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">After (TOON)</div>
+              <div class="output-box" id="toonOutput">Enter valid JSON to convert</div>
+            </div>
+            <div class="result-card">
+              <div class="result-label">Analysis</div>
+              <div class="analysis-box" id="toonAnalysis">Enter valid JSON to convert</div>
+            </div>
+          </div>
           <button class="copy-btn" onclick="copyOutput('toonOutput')">📋 Copy Output</button>
         </div>
       </div>
@@ -481,36 +646,98 @@
       return parseJSON(input);
     }
 
+    function formatAnalysisSummary(result) {
+      if (typeof result === 'string') return result;
+      if (!result || typeof result !== 'object') return 'Analysis unavailable.';
+
+      const {
+        originalTokens,
+        optimizedTokens,
+        savings,
+        savingsPercent,
+        originalCharacters,
+        optimizedCharacters,
+      } = result;
+
+      const reductionLabel = savingsPercent > 0 ? `Reduced by ${savingsPercent}%` : 'No reduction detected';
+      const highlightClass = savingsPercent > 0 ? '' : 'negative';
+
+      return `
+        <div class="analysis-highlight ${highlightClass}">${reductionLabel}</div>
+        <div class="analysis-meta">
+          <div class="meta-pill"><strong>Tokens</strong>${originalTokens} → ${optimizedTokens}</div>
+          <div class="meta-pill"><strong>Savings</strong>${savings} tokens</div>
+          <div class="meta-pill"><strong>Characters</strong>${originalCharacters} → ${optimizedCharacters}</div>
+          <div class="meta-pill"><strong>Estimator</strong>heuristic: 1 token ≈ 4 characters</div>
+        </div>
+      `;
+    }
+
+    function formatCharSummary(originalValue, transformedValue, label) {
+      const originalChars = typeof originalValue === 'string'
+        ? originalValue.length
+        : JSON.stringify(originalValue).length;
+      const transformedChars = typeof transformedValue === 'string'
+        ? transformedValue.length
+        : JSON.stringify(transformedValue).length;
+      const savings = Math.max(0, originalChars - transformedChars);
+      const savingsPercent = originalChars > 0 ? Math.round((savings / originalChars) * 100) : 0;
+      const reductionLabel = savingsPercent > 0 ? `Reduced by ${savingsPercent}%` : 'No reduction detected';
+      const highlightClass = savingsPercent > 0 ? '' : 'negative';
+
+      return `
+        <div class="analysis-highlight ${highlightClass}">${reductionLabel}</div>
+        <div class="analysis-meta">
+          <div class="meta-pill"><strong>Output</strong>${label}</div>
+          <div class="meta-pill"><strong>Characters</strong>${originalChars} → ${transformedChars}</div>
+          <div class="meta-pill"><strong>Savings</strong>${savings} chars</div>
+          <div class="meta-pill"><strong>Size</strong>${savingsPercent}% smaller</div>
+        </div>
+      `;
+    }
+
     function processAndDisplay() {
       const json = getInputJSON();
       if (!json) return;
 
       try {
+        const inputText = JSON.stringify(json, null, 2);
+
         // Analyze
         const analysisResult = npmAnalyze(json);
-        const analysisText = typeof analysisResult === 'string' ? analysisResult : JSON.stringify(analysisResult, null, 2);
-        document.getElementById('analyzeOutput').textContent = analysisText;
+        document.getElementById('analyzeInput').textContent = inputText;
+        document.getElementById('analyzeAnalysis').innerHTML = formatAnalysisSummary(analysisResult);
 
         // Compact
         const compacted = npmCompact(json);
         const compactedText = typeof compacted === 'string' ? compacted : JSON.stringify(compacted, null, 2);
+        document.getElementById('compactInput').textContent = inputText;
         document.getElementById('compactOutput').textContent = compactedText;
+        document.getElementById('compactAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { compact: true }));
 
         // Flatten
         const flattened = npmFlatten(json);
+        document.getElementById('flattenInput').textContent = inputText;
         document.getElementById('flattenOutput').textContent = JSON.stringify(flattened, null, 2);
+        document.getElementById('flattenAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { flatten: true }));
 
         // Prune
         const pruned = npmPrune(json, { removeKeys: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] });
+        document.getElementById('pruneInput').textContent = inputText;
         document.getElementById('pruneOutput').textContent = JSON.stringify(pruned, null, 2);
+        document.getElementById('pruneAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { prune: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] }));
 
         // Natural Language
         const natural = npmToNatural(json);
+        document.getElementById('naturalInput').textContent = inputText;
         document.getElementById('naturalOutput').textContent = natural;
+        document.getElementById('naturalAnalysis').innerHTML = formatCharSummary(json, natural, 'Natural-language transformation');
 
         // TOON
         const toon = npmToTOON(json);
+        document.getElementById('toonInput').textContent = inputText;
         document.getElementById('toonOutput').textContent = toon;
+        document.getElementById('toonAnalysis').innerHTML = formatCharSummary(json, toon, 'TOON transformation');
 
         clearError();
       } catch (e) {
@@ -534,7 +761,7 @@
         .toLowerCase()
         .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
         .replace(/[^a-z]/g, '');
-      return TAB_ALIASES[normalized] || 'analyze';
+      return TAB_ALIASES[normalized] || 'prune';
     }
 
     function resolveTabFromURL() {
@@ -589,19 +816,32 @@
       const example = {
         product: {
           name: 'Wireless Headphones',
-          price: 79.99
+          price: 79.99,
+          debug: true,
+          internal: {
+            apiKey: 'secret-key',
+            notes: 'remove me'
+          }
         },
         users: [
-          { id: 1, name: 'Ali' },
-          { id: 2, name: 'John' }
+          { id: 1, name: 'Ali', createdAt: '2024-01-01', debug: false },
+          { id: 2, name: 'John', createdAt: '2024-01-02', debug: false }
         ],
         policy: {
           holderName: 'Carlos Rivera',
           policyNumber: 'HLT-2048',
+          createdAt: '2024-01-03',
           claim: {
             status: 'under review',
-            requestedAmount: 64000
+            requestedAmount: 64000,
+            internal: {
+              reviewer: 'team-a'
+            }
           }
+        },
+        metadata: {
+          timestamp: '2024-01-03',
+          source: 'demo'
         }
       };
       document.getElementById('jsonInput').value = JSON.stringify(example, null, 2);
@@ -613,10 +853,13 @@
       document.querySelectorAll('.output-box').forEach(box => {
         box.textContent = 'Enter valid JSON to see output';
       });
+      document.querySelectorAll('.analysis-box').forEach(box => {
+        box.innerHTML = 'Enter valid JSON to see analysis';
+      });
     }
 
     function showError(msg) {
-      const containers = document.querySelectorAll('.output-box');
+      const containers = document.querySelectorAll('.output-box, .analysis-box');
       const error = `<div class="error">❌ ${msg}</div>`;
       containers.forEach(box => box.innerHTML = error);
     }
