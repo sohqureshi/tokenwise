@@ -3,8 +3,8 @@
 TokenWise is a lightweight utility for preparing JSON before sending it to AI models. It helps reduce payload noise, shrink token usage, and turn structured data into formats that are easier for LLMs to consume.
 
 
-![npm version](https://img.shields.io/npm/v/tokenwise)
-![downloads](https://img.shields.io/npm/dw/tokenwise)
+[![npm version](https://img.shields.io/npm/v/%40sohqureshi%2Ftokenwise)](https://www.npmjs.com/package/@sohqureshi/tokenwise)
+[![downloads](https://img.shields.io/npm/dw/%40sohqureshi%2Ftokenwise)](https://www.npmjs.com/package/@sohqureshi/tokenwise)
 ![license](https://img.shields.io/github/license/sohqureshi/tokenwise)
 ![stars](https://img.shields.io/github/stars/sohqureshi/tokenwise?style=social)
 [![Demo](https://img.shields.io/badge/Live%20Demo-Visit-brightgreen)](https://sohqureshi.github.io/tokenwise/)
@@ -35,6 +35,8 @@ Raw JSON is:
 ```bash
 npm install @sohqureshi/tokenwise
 ```
+
+Available on [npm](https://www.npmjs.com/package/@sohqureshi/tokenwise).
 
 ## Quick Usage
 
@@ -68,7 +70,7 @@ console.log(ai(product).compact().value());
 Removes fields you do not want to send to the model. By default it also removes `null`, `undefined`, and empty objects.
 
 ```js
-import { prune } from "tokenwise";
+import { prune } from "@sohqureshi/tokenwise";
 
 const input = {
   user: { name: "John", age: 28 },
