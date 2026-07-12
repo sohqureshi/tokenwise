@@ -47,14 +47,14 @@ export function toTOON(data: any, indent = 0): string {
     }
 
     // Primitive array
-    return `${space}[${data.length}]: ${data.join(",")}`;
+    return `${space}[${data.length}]: ${data.map(formatValue).join(",")}`;
   }
 
   // Handle objects
   if (typeof data === "object" && data !== null) {
     let result = "";
 
-    for (const key in data) {
+    for (const key of Object.keys(data)) {
       const value = data[key];
 
       if (typeof value === "object" && value !== null) {
@@ -78,7 +78,11 @@ export function toTOON(data: any, indent = 0): string {
  */
 function formatValue(val: any): string {
   if (val === null || val === undefined) return "";
-  if (typeof val === "string") return val;
+  if (typeof val === "string") {
+    // Commas and line breaks delimit TOON cells, so preserve such strings with
+    // JSON escaping instead of producing ambiguous output.
+    return val === "" || /[,\n\r]/.test(val) ? JSON.stringify(val) : val;
+  }
   return String(val);
 }
 

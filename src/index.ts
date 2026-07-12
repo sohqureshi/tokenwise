@@ -9,7 +9,7 @@ import { flatten } from "./core/flatten";
 import { toTOON } from "./core/toon";
 import { analyze } from "./core/analyze";
 import { toNatural } from "./core/natural";
-import { estimateTokens } from "./core/token";
+import { estimateTokens, serializeForTokenEstimate } from "./core/token";
 
 // callable function (main entry)
 function ai(data: any) {
@@ -24,7 +24,8 @@ ai.toTOON = toTOON;
 ai.analyze = analyze;
 ai.toNatural = toNatural;
 ai.estimateTokens = estimateTokens;
+ai.serializeForTokenEstimate = serializeForTokenEstimate;
 ai.AIChain = AIChain;
 
 export default ai;
-export { AIChain, prune, compact, flatten, toTOON, analyze, toNatural, estimateTokens };
+export { AIChain, prune, compact, flatten, toTOON, analyze, toNatural, estimateTokens, serializeForTokenEstimate };

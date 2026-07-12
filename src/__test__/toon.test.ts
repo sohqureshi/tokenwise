@@ -97,6 +97,12 @@ describe('toTOON', () => {
     )
   })
 
+  it('should escape delimiter characters in primitive array values', () => {
+    expect(toTOON({ items: ["Mumbai, India", "line\nbreak"] })).toBe(
+      'items:\n  [2]: "Mumbai, India","line\\nbreak"'
+    )
+  })
+
   it('should handle mixed data types', () => {
     const input = {
       str: "hello",

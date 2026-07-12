@@ -8,9 +8,18 @@ describe('analyze()', () => {
     const result = analyze(input);
 
     expect(result.savings).toBeGreaterThanOrEqual(0);
-    expect(result.originalTokens).toBeGreaterThanOrEqual(0);
+    expect(result.originalTokens).toBe(Math.ceil(JSON.stringify(input).length / 4));
     expect(result.optimizedTokens).toBeGreaterThanOrEqual(0);
     expect(result.savingsPercent).toBeGreaterThanOrEqual(0);
+  });
+
+  it('should measure JSON objects instead of silently treating them as zero tokens', () => {
+    const input = { user: { name: "Alice" } };
+    const result = analyze(input);
+
+    expect(result.originalTokens).toBeGreaterThan(0);
+    expect(result.originalCharacters).toBe(JSON.stringify(input).length);
+    expect(result.estimator).toContain('heuristic');
   });
 
   it('should return 0 savings when no optimization is applied', () => {

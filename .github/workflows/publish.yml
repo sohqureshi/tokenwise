@@ -34,7 +34,7 @@ jobs:
         run: npm run build
 
       - name: Run tests
-        run: npm test -- --run
+        run: npm run test:run
 
       - name: Publish package
         run: npm publish --access public --provenance

@@ -85,4 +85,8 @@ describe('flatten', () => {
       status: "active"
     })
   })
+
+  it('should reject ambiguous dot-path collisions', () => {
+    expect(() => flatten({ "a.b": 1, a: { b: 2 } })).toThrow('collides')
+  })
 })

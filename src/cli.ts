@@ -27,7 +27,7 @@ Usage:
 Options:
   --toon       Convert JSON to TOON format
   --compact    Convert JSON to compact format
-  --analyze    Show token analysis
+  --analyze    Show token analysis (heuristic estimate)
 `);
   process.exit(0);
 }

@@ -39,7 +39,7 @@ npm install @sohqureshi/tokenwise
 ## Quick Usage
 
 ```js
-import ai, { compact, flatten, toNatural, toTOON } from "tokenwise";
+import ai, { compact, flatten, toNatural, toTOON } from "@sohqureshi/tokenwise";
 
 const product = {
   product: {
@@ -208,14 +208,16 @@ LLMs charge and reason over tokens. Sending raw JSON often includes repeated key
 node demo.js
 ```
 
-You can visualize token optimization results using planned CLI/Web visual tools.
+Use `--analyze` to compare serialized input and output with TokenWise's
+four-characters-per-token heuristic. This is an estimate, not a replacement
+for a model-specific tokenizer or a provider's billed token count.
 
 ---
 
 ## 🚀 Roadmap
 
-* [x] CLI support *(Coming Soon)*
-* [ ] NPM Support
+* [x] CLI support
+* [x] NPM Support
 * [ ] Streaming support (GB+ data)
 * [ ] Schema-aware optimization
 * [ ] SaaS API

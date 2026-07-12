@@ -45,7 +45,7 @@ export function prune(
   // Object handling
   const result: any = {};
 
-  for (const key in obj) {
+  for (const key of Object.keys(obj)) {
     if (removeKeys.includes(key)) continue;
 
     const value = prune(obj[key], normalizedOptions);

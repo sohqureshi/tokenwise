@@ -2,12 +2,20 @@ import { prune } from "./prune";
 import { compact } from "./compact";
 import { flatten } from "./flatten";
 import { toTOON } from "./toon";
-import { estimateTokens } from "./token";
+import { estimateTokens, serializeForTokenEstimate } from "./token";
 
 /**
  * Safe version of analyze() - Prevents NaN values
  */
-export function analyze(input: any, options: any = {}) {
+export type AnalyzeOptions = {
+  prune?: string[];
+  compact?: boolean;
+  flatten?: boolean;
+  toTOON?: boolean;
+  toon?: boolean;
+};
+
+export function analyze(input: unknown, options: AnalyzeOptions = {}) {
   if (!input || (typeof input === "object" && input !== null && Object.keys(input).length === 0)) {
     return {
       originalTokens: 0,
@@ -16,15 +24,17 @@ export function analyze(input: any, options: any = {}) {
       savingsPercent: 0,
       optimizedData: null,
       reductionRatio: 1,
+      originalCharacters: 0,
+      optimizedCharacters: 0,
+      estimator: "heuristic: 1 token ≈ 4 characters",
     };
   }
 
   // 1. Original tokens
-  let originalTokens = estimateTokens(input);
-  if (isNaN(originalTokens) || !isFinite(originalTokens)) originalTokens = 0;
+  const originalTokens = estimateTokens(input);
 
   // 2. Optimization chain
-  let optimizedData = input;
+  let optimizedData: unknown = input;
 
   if (options.prune && Array.isArray(options.prune)) {
     optimizedData = prune(optimizedData, options.prune);
@@ -43,8 +53,7 @@ export function analyze(input: any, options: any = {}) {
   }
 
   // 3. Optimized tokens
-  let optimizedTokens = estimateTokens(optimizedData);
-  if (isNaN(optimizedTokens) || !isFinite(optimizedTokens)) optimizedTokens = 0;
+  const optimizedTokens = estimateTokens(optimizedData);
 
   // 4. Safe savings calculation
   const savings = Math.max(0, originalTokens - optimizedTokens);
@@ -64,5 +73,8 @@ export function analyze(input: any, options: any = {}) {
     savingsPercent,
     optimizedData,
     reductionRatio,
+    originalCharacters: serializeForTokenEstimate(input).length,
+    optimizedCharacters: serializeForTokenEstimate(optimizedData).length,
+    estimator: "heuristic: 1 token ≈ 4 characters",
   };
 }

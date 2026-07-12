@@ -13,24 +13,35 @@
  * flatten({ user: { name: "Ali" } })
  * -> { "user.name": "Ali" }
  */
-export function flatten(obj: any, prefix = '', res: any = {}) {
+export function flatten(obj: any, prefix = '', res: Record<string, unknown> = {}) {
   if (obj === null || obj === undefined) return res
 
   if (typeof obj !== 'object') {
-    res[prefix] = obj
+    setValue(res, prefix, obj)
     return res
   }
 
-  for (const key in obj) {
+  for (const key of Object.keys(obj)) {
     const value = obj[key]
     const newKey = prefix ? `${prefix}.${key}` : key
 
     if (typeof value === 'object' && value !== null) {
       flatten(value, newKey, res)
     } else {
-      res[newKey] = value
+      setValue(res, newKey, value)
     }
   }
 
   return res
+}
+
+function setValue(res: Record<string, unknown>, key: string, value: unknown) {
+  if (Object.prototype.hasOwnProperty.call(res, key)) {
+    throw new Error(
+      `Cannot flatten input: the path "${key}" collides with an existing key. ` +
+      "Use keys without dots or rename one of the conflicting properties."
+    )
+  }
+
+  res[key] = value
 }
