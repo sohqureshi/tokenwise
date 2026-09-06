@@ -460,6 +460,17 @@
     <div class="header">
       <h1>Interactive Demo</h1>
       <p>Paste your JSON below and explore all features in real-time</p>
+      <div style="margin-top:12px;">
+        <label for="modelSelect" style="font-size:0.9rem;color:#94a3b8;margin-right:8px;">Model:</label>
+        <select id="modelSelect" style="padding:6px 8px;border-radius:6px;background:#0f172a;color:#e2e8f0;border:1px solid rgba(148,163,184,0.08);">
+          <option value="gpt-4">gpt-4</option>
+          <option value="gpt-4o-mini">gpt-4o-mini</option>
+          <option value="gpt-4o">gpt-4o</option>
+          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+          <option value="text-davinci-003">text-davinci-003 (legacy)</option>
+          <option value="auto">Auto-detect</option>
+        </select>
+      </div>
     </div>
 
     <!-- Demo Layout -->
@@ -680,6 +691,17 @@
       return parseJSON(input);
     }
 
+    function getEncodingForModel(model) {
+      if (!model || model === 'auto') return 'unknown';
+      const m = String(model).toLowerCase();
+      // Modern OpenAI models and most new GPT-family models use cl100k_base
+      if (m.includes('gpt') || m.includes('gpt-4') || m.includes('gpt-3.5') || m.includes('gpt-4o')) return 'cl100k_base';
+      // Legacy text/davinci models use r50k_base
+      if (m.includes('davinci') || m.includes('text-')) return 'r50k_base';
+      // Conservative default
+      return 'cl100k_base';
+    }
+
     function formatAnalysisSummary(result) {
       if (typeof result === 'string') return result;
       if (!result || typeof result !== 'object') return 'Analysis unavailable.';
@@ -691,7 +713,16 @@
         savingsPercent,
         originalCharacters,
         optimizedCharacters,
+        estimator,
       } = result;
+
+      const selectedModelEl = document.getElementById('modelSelect');
+      const model = selectedModelEl ? selectedModelEl.value : 'gpt-4';
+      const encoding = getEncodingForModel(model);
+
+      const estimatorLabel = estimator
+        ? estimator
+        : `model=${model} encoding=${encoding} (exact tokenizer requires tiktoken locally; demo may fall back to heuristic)`;
 
       const reductionLabel = savingsPercent > 0 ? `Reduced by ${savingsPercent}%` : 'No reduction detected';
       const highlightClass = savingsPercent > 0 ? '' : 'negative';
@@ -702,7 +733,7 @@
           <div class="meta-pill"><strong>Tokens</strong>${originalTokens} → ${optimizedTokens}</div>
           <div class="meta-pill"><strong>Savings</strong>${savings} tokens</div>
           <div class="meta-pill"><strong>Characters</strong>${originalCharacters} → ${optimizedCharacters}</div>
-          <div class="meta-pill"><strong>Estimator</strong>heuristic: 1 token ≈ 4 characters</div>
+          <div class="meta-pill"><strong>Estimator</strong>${estimatorLabel}</div>
         </div>
       `;
     }
@@ -736,9 +767,12 @@
 
       try {
         const inputText = JSON.stringify(json, null, 2);
+        const selectedModelEl = document.getElementById('modelSelect');
+        const model = selectedModelEl ? selectedModelEl.value : 'gpt-4';
+        const analyzeOpts = { exact: true, model, fallbackToHeuristic: true };
 
         // Analyze
-        const analysisResult = npmAnalyze(json);
+        const analysisResult = npmAnalyze(json, analyzeOpts);
         document.getElementById('analyzeInput').textContent = inputText;
         document.getElementById('analyzeAnalysis').innerHTML = formatAnalysisSummary(analysisResult);
 
@@ -747,19 +781,19 @@
         const compactedText = typeof compacted === 'string' ? compacted : JSON.stringify(compacted, null, 2);
         document.getElementById('compactInput').textContent = inputText;
         document.getElementById('compactOutput').textContent = compactedText;
-        document.getElementById('compactAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { compact: true }));
+        document.getElementById('compactAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, compact: true }));
 
         // Flatten
         const flattened = npmFlatten(json);
         document.getElementById('flattenInput').textContent = inputText;
         document.getElementById('flattenOutput').textContent = JSON.stringify(flattened, null, 2);
-        document.getElementById('flattenAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { flatten: true }));
+        document.getElementById('flattenAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, flatten: true }));
 
         // Prune
         const pruned = npmPrune(json, { removeKeys: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] });
         document.getElementById('pruneInput').textContent = inputText;
         document.getElementById('pruneOutput').textContent = JSON.stringify(pruned, null, 2);
-        document.getElementById('pruneAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { prune: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] }));
+        document.getElementById('pruneAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, prune: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] }));
 
         // Natural Language
         const natural = npmToNatural(json);
