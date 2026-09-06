@@ -217,6 +217,19 @@ This is still only as exact as the tokenizer implementation you use.
 
 ---
 
+## Release Notes
+
+### v1.0.8 — 2026-09-06
+
+- Expose exact tokenizer metadata when available (model + encoding), and fall back to a clear, model-aware estimator in browser demos.
+- Demo updated to show selected model and expected encoding when the exact tokenizer (tiktoken) is not available in-browser.
+- Updated analyze() to surface tokenizer encoding in analysis output so the demo shows "Estimator: model=gpt-4 expected_encoding=cl100k_base" even when using the heuristic fallback.
+- Misc: build artifacts updated and docs demo import bumped to v1.0.7 CDN bundle.
+
+If you want the browser demo to display truly exact token counts, run the demo against a small Node endpoint (or local server) that has tiktoken installed and uses analyze(..., { exact: true }). The estimator will display the real tokenizer encoding when tiktoken is present.
+
+---
+
 ## 🚀 Roadmap
 
 * [x] CLI support
