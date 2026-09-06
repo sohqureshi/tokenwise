@@ -211,8 +211,9 @@ node demo.js
 ```
 
 Use `--analyze` to compare serialized input and output with TokenWise's
-four-characters-per-token heuristic. This is an estimate, not a replacement
-for a model-specific tokenizer or a provider's billed token count.
+four-characters-per-token heuristic. For model-accurate counts, pass
+`exact: true` and a `model` name to `estimateTokens()` or `analyze()`.
+This is still only as exact as the tokenizer implementation you use.
 
 ---
 

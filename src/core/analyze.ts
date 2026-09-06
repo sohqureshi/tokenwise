@@ -13,9 +13,18 @@ export type AnalyzeOptions = {
   flatten?: boolean;
   toTOON?: boolean;
   toon?: boolean;
+  exact?: boolean;
+  model?: string;
+  fallbackToHeuristic?: boolean;
 };
 
 export function analyze(input: unknown, options: AnalyzeOptions = {}) {
+  const {
+    exact = false,
+    model = "gpt-4o-mini",
+    fallbackToHeuristic = true,
+  } = options;
+
   if (!input || (typeof input === "object" && input !== null && Object.keys(input).length === 0)) {
     return {
       originalTokens: 0,
@@ -26,12 +35,16 @@ export function analyze(input: unknown, options: AnalyzeOptions = {}) {
       reductionRatio: 1,
       originalCharacters: 0,
       optimizedCharacters: 0,
-      estimator: "heuristic: 1 token ≈ 4 characters",
+      estimator: exact ? `exact tokenizer: model=${model}` : "heuristic: 1 token ≈ 4 characters",
     };
   }
 
   // 1. Original tokens
-  const originalTokens = estimateTokens(input);
+  const originalTokens = estimateTokens(input, {
+    exact,
+    model,
+    fallbackToHeuristic,
+  });
 
   // 2. Optimization chain
   let optimizedData: unknown = input;
@@ -53,7 +66,11 @@ export function analyze(input: unknown, options: AnalyzeOptions = {}) {
   }
 
   // 3. Optimized tokens
-  const optimizedTokens = estimateTokens(optimizedData);
+  const optimizedTokens = estimateTokens(optimizedData, {
+    exact,
+    model,
+    fallbackToHeuristic,
+  });
 
   // 4. Safe savings calculation
   const savings = Math.max(0, originalTokens - optimizedTokens);
@@ -75,6 +92,6 @@ export function analyze(input: unknown, options: AnalyzeOptions = {}) {
     reductionRatio,
     originalCharacters: serializeForTokenEstimate(input).length,
     optimizedCharacters: serializeForTokenEstimate(optimizedData).length,
-    estimator: "heuristic: 1 token ≈ 4 characters",
+    estimator: exact ? `exact tokenizer: model=${model}` : "heuristic: 1 token ≈ 4 characters",
   };
 }

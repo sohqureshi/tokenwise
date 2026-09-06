@@ -37,8 +37,8 @@ export class AIChain {
     return toNatural(this.data);
   }
 
-  analyze() {
-    return analyze(this.data);
+  analyze(options?: any) {
+    return analyze(this.data, options);
   }
 
   value() {

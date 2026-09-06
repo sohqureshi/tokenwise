@@ -75,6 +75,9 @@
   ],
   "author": "Mohammad Sohail",
   "license": "MIT",
+  "dependencies": {
+    "tiktoken": "^1.0.22"
+  },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "tsup": "^8.0.0",
