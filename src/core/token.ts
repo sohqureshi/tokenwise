@@ -105,11 +105,20 @@ export function estimateTokensWithMeta(
     const estimator = `exact tokenizer: model=${model} encoding=${encodingName}`;
     return { count, estimator };
   } catch (e) {
-    // tiktoken not available or failed — decide whether to fall back
+    // tiktoken not available or failed — prepare a helpful estimator string that still
+    // reports the model and the expected encoding. Return heuristic count but expose
+    // the expected encoding so the demo can show the selected tokenizer metadata.
+    const m = String(model || '').toLowerCase();
+    const expectedEncoding = (m.includes('davinci') || m.startsWith('text-')) ? 'r50k_base' : 'cl100k_base';
+
     if (!fallbackToHeuristic) {
-      // If caller requested exact and no fallback, return heuristic but mark as unavailable
-      return { count: heuristic, estimator: "exact requested but tokenizer unavailable" };
+      // If caller requested exact and no fallback, indicate tokenizer unavailable but
+      // include expected encoding for clarity.
+      return { count: heuristic, estimator: `exact requested but tokenizer unavailable (expected encoding=${expectedEncoding} for model=${model})` };
     }
-    return { count: heuristic, estimator: heuristicEstimator };
+
+    // Fallback with informative estimator
+    const fallbackEstimator = `heuristic: 1 token ≈ 4 characters (model=${model} expected_encoding=${expectedEncoding})`;
+    return { count: heuristic, estimator: fallbackEstimator };
   }
 }
