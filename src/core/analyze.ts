@@ -2,7 +2,7 @@ import { prune } from "./prune";
 import { compact } from "./compact";
 import { flatten } from "./flatten";
 import { toTOON } from "./toon";
-import { estimateTokens, serializeForTokenEstimate } from "./token";
+import { estimateTokens, estimateTokensWithMeta, serializeForTokenEstimate } from "./token";
 
 /**
  * Safe version of analyze() - Prevents NaN values
@@ -39,12 +39,13 @@ export function analyze(input: unknown, options: AnalyzeOptions = {}) {
     };
   }
 
-  // 1. Original tokens
-  const originalTokens = estimateTokens(input, {
+  // 1. Original tokens (try to get exact estimator metadata)
+  const originalMeta = estimateTokensWithMeta(input, {
     exact,
     model,
     fallbackToHeuristic,
   });
+  const originalTokens = originalMeta.count;
 
   // 2. Optimization chain
   let optimizedData: unknown = input;
@@ -65,12 +66,13 @@ export function analyze(input: unknown, options: AnalyzeOptions = {}) {
     optimizedData = toTOON(optimizedData);
   }
 
-  // 3. Optimized tokens
-  const optimizedTokens = estimateTokens(optimizedData, {
+  // 3. Optimized tokens (also try to get estimator metadata)
+  const optimizedMeta = estimateTokensWithMeta(optimizedData, {
     exact,
     model,
     fallbackToHeuristic,
   });
+  const optimizedTokens = optimizedMeta.count;
 
   // 4. Safe savings calculation
   const savings = Math.max(0, originalTokens - optimizedTokens);
@@ -83,6 +85,9 @@ export function analyze(input: unknown, options: AnalyzeOptions = {}) {
     ? optimizedTokens / originalTokens 
     : 1;
 
+  // Prefer the original estimator metadata if present, otherwise fall back to the optimized one
+  const estimatorLabel = originalMeta && originalMeta.estimator ? originalMeta.estimator : optimizedMeta.estimator;
+
   return {
     originalTokens,
     optimizedTokens,
@@ -92,6 +97,7 @@ export function analyze(input: unknown, options: AnalyzeOptions = {}) {
     reductionRatio,
     originalCharacters: serializeForTokenEstimate(input).length,
     optimizedCharacters: serializeForTokenEstimate(optimizedData).length,
-    estimator: exact ? `exact tokenizer: model=${model}` : "heuristic: 1 token ≈ 4 characters",
+    estimator: estimatorLabel,
   };
 }
+
