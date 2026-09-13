@@ -27,7 +27,7 @@ Usage:
 Options:
   --toon       Convert JSON to TOON format
   --compact    Convert JSON to compact format
-  --analyze    Show token analysis (heuristic estimate)
+  --analyze    Show token analysis (tiktoken estimate)
 `);
   process.exit(0);
 }
@@ -65,4 +65,3 @@ if (args.includes("--toon")) {
 } else {
   console.log("⚠️ No valid option provided. Use --toon, --compact or --analyze");
 }
-
