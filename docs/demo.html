@@ -171,6 +171,25 @@
       flex-wrap: wrap;
     }
 
+    .model-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 4px;
+      color: #cbd5e1;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .model-control select {
+      padding: 8px 9px;
+      max-width: 170px;
+      border-radius: 7px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
     .btn {
       padding: 10px 16px;
       background: var(--primary);
@@ -333,6 +352,17 @@
       .btn {
         padding: 9px 12px;
         font-size: 0.85rem;
+      }
+
+      .model-control {
+        width: 100%;
+        justify-content: space-between;
+        padding: 0;
+      }
+
+      .model-control select {
+        flex: 1;
+        max-width: none;
       }
 
       .tab-buttons {
@@ -593,17 +623,6 @@
     <div class="header">
       <h1>Interactive Demo</h1>
       <p>Paste your JSON below and explore all features in real-time</p>
-      <div style="margin-top:12px;">
-        <label for="modelSelect" style="font-size:0.9rem;color:#94a3b8;margin-right:8px;">Model:</label>
-        <select id="modelSelect" style="padding:6px 8px;border-radius:6px;background:#0f172a;color:#e2e8f0;border:1px solid rgba(148,163,184,0.08);">
-          <option value="gpt-4">gpt-4</option>
-          <option value="gpt-4o-mini">gpt-4o-mini</option>
-          <option value="gpt-4o">gpt-4o</option>
-          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-          <option value="text-davinci-003">text-davinci-003 (legacy)</option>
-          <option value="auto">Auto-detect</option>
-        </select>
-      </div>
     </div>
 
     <!-- Demo Layout -->
@@ -634,6 +653,16 @@
   }
 }'></textarea>
           <div class="buttons">
+            <label class="model-control" for="modelSelect">Model
+              <select id="modelSelect">
+                <option value="gpt-4">gpt-4</option>
+                <option value="gpt-4o-mini">gpt-4o-mini</option>
+                <option value="gpt-4o">gpt-4o</option>
+                <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                <option value="text-davinci-003">text-davinci-003 (legacy)</option>
+                <option value="auto">Auto-detect</option>
+              </select>
+            </label>
             <button class="btn" onclick="loadExample()"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span> Load Example</button>
             <button class="btn secondary" onclick="clearInput()"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-12"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></span> Clear</button>
           </div>
@@ -1168,6 +1197,7 @@
     const input = document.getElementById('jsonInput');
     input.addEventListener('input', processAndDisplay);
     input.addEventListener('change', processAndDisplay);
+    document.getElementById('modelSelect').addEventListener('change', processAndDisplay);
 
     // Load example and activate URL-driven tab on page load
     window.addEventListener('load', () => {
