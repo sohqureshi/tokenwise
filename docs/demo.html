@@ -732,6 +732,51 @@
       background: rgba(56, 189, 248, 0.2);
     }
 
+    .developer-snippet {
+      margin-top: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.72);
+    }
+
+    .developer-snippet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 12px;
+      color: #cbd5e1;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .snippet-copy-btn {
+      padding: 4px 8px;
+      background: transparent;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--primary);
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .snippet-copy-btn:hover {
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .developer-snippet pre {
+      margin: 0;
+      padding: 12px;
+      border-top: 1px solid rgba(148, 163, 184, 0.12);
+      color: #dbeafe;
+      font: 0.78rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      max-height: 280px;
+      overflow: auto;
+    }
+
     .info-box {
       background: rgba(56, 189, 248, 0.05);
       border: 1px solid rgba(56, 189, 248, 0.1);
@@ -854,6 +899,10 @@
             </div>
           </div>
           <button class="copy-btn" onclick="copyOutput('analyzeAnalysis')"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span> Copy Output</button>
+          <div class="developer-snippet">
+            <div class="developer-snippet-header"><span>Developer snippet</span><button class="snippet-copy-btn" onclick="copySnippet('analyze')">Copy code</button></div>
+            <pre id="analyzeSnippet">Enter valid JSON to generate a snippet</pre>
+          </div>
         </div>
 
         <!-- Compact Tab -->
@@ -870,6 +919,10 @@
             </div>
           </div>
           <button class="copy-btn" onclick="copyOutput('compactOutput')"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span> Copy Output</button>
+          <div class="developer-snippet">
+            <div class="developer-snippet-header"><span>Developer snippet</span><button class="snippet-copy-btn" onclick="copySnippet('compact')">Copy code</button></div>
+            <pre id="compactSnippet">Enter valid JSON to generate a snippet</pre>
+          </div>
         </div>
 
         <!-- Flatten Tab -->
@@ -886,6 +939,10 @@
             </div>
           </div>
           <button class="copy-btn" onclick="copyOutput('flattenOutput')"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span> Copy Output</button>
+          <div class="developer-snippet">
+            <div class="developer-snippet-header"><span>Developer snippet</span><button class="snippet-copy-btn" onclick="copySnippet('flatten')">Copy code</button></div>
+            <pre id="flattenSnippet">Enter valid JSON to generate a snippet</pre>
+          </div>
         </div>
 
         <!-- Prune Tab -->
@@ -921,6 +978,10 @@
             </div>
           </div>
           <button class="copy-btn" onclick="copyOutput('pruneOutput')"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span> Copy Output</button>
+          <div class="developer-snippet">
+            <div class="developer-snippet-header"><span>Developer snippet</span><button class="snippet-copy-btn" onclick="copySnippet('prune')">Copy code</button></div>
+            <pre id="pruneSnippet">Enter valid JSON to generate a snippet</pre>
+          </div>
         </div>
 
         <!-- Natural Tab -->
@@ -937,6 +998,10 @@
             </div>
           </div>
           <button class="copy-btn" onclick="copyOutput('naturalOutput')"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span> Copy Output</button>
+          <div class="developer-snippet">
+            <div class="developer-snippet-header"><span>Developer snippet</span><button class="snippet-copy-btn" onclick="copySnippet('natural')">Copy code</button></div>
+            <pre id="naturalSnippet">Enter valid JSON to generate a snippet</pre>
+          </div>
         </div>
 
         <!-- TOON Tab -->
@@ -950,6 +1015,10 @@
             <div class="result-card">
               <div class="result-label">Analysis</div>
               <div class="analysis-box" id="toonAnalysis">Enter valid JSON to convert</div>
+              <div class="developer-snippet">
+                <div class="developer-snippet-header"><span>Developer snippet</span><button class="snippet-copy-btn" onclick="copySnippet('toon')">Copy code</button></div>
+                <pre id="toonSnippet">Enter valid JSON to generate a snippet</pre>
+              </div>
             </div>
           </div>
           <button class="copy-btn" onclick="copyOutput('toonOutput')"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span> Copy Output</button>
@@ -1177,6 +1246,34 @@
       `;
     }
 
+    function formatDeveloperSnippet(operation, value, model, pruneOptions) {
+      const inputSource = JSON.stringify(value, null, 2);
+      const modelSource = JSON.stringify(model);
+      const lines = [
+        'import { analyze, compact, flatten, prune, toNatural, toTOON } from "@sohqureshi/tokenwise";',
+        '',
+        `const input = ${inputSource};`,
+        ''
+      ];
+
+      if (operation === 'analyze') {
+        lines.push(`const result = analyze(input, { exact: true, model: ${modelSource}, fallbackToHeuristic: true });`);
+      } else if (operation === 'compact') {
+        lines.push('const result = compact(input);');
+      } else if (operation === 'flatten') {
+        lines.push('const result = flatten(input);');
+      } else if (operation === 'prune') {
+        lines.push(`const result = prune(input, ${JSON.stringify(pruneOptions, null, 2)});`);
+      } else if (operation === 'natural') {
+        lines.push('const result = toNatural(input);');
+      } else {
+        lines.push('const result = toTOON(input);');
+      }
+
+      lines.push('', 'console.log(result);');
+      return lines.join('\n');
+    }
+
     const recommendedPruneKeys = new Set([
       'id',
       'debug',
@@ -1307,17 +1404,20 @@
 
         // Inspect input without applying an optimization.
         document.getElementById('analyzeAnalysis').innerHTML = formatInputOverview(json, model);
+        document.getElementById('analyzeSnippet').textContent = formatDeveloperSnippet('analyze', json, model);
 
         // Compact
         const compacted = npmCompact(json);
         const compactedText = typeof compacted === 'string' ? compacted : JSON.stringify(compacted, null, 2);
         document.getElementById('compactOutput').textContent = compactedText;
         document.getElementById('compactAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, compact: true }), 'Compacting');
+        document.getElementById('compactSnippet').textContent = formatDeveloperSnippet('compact', json, model);
 
         // Flatten
         const flattened = npmFlatten(json);
         document.getElementById('flattenOutput').textContent = JSON.stringify(flattened, null, 2);
         document.getElementById('flattenAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, flatten: true }), 'Flattening');
+        document.getElementById('flattenSnippet').textContent = formatDeveloperSnippet('flatten', json, model);
 
         // Prune
         const pruneOptions = {
@@ -1330,11 +1430,13 @@
         const pruned = npmPrune(json, pruneOptions);
         document.getElementById('pruneOutput').textContent = JSON.stringify(pruned, null, 2);
         document.getElementById('pruneAnalysis').innerHTML = formatTokenSummary(json, pruned, 'Pruning');
+        document.getElementById('pruneSnippet').textContent = formatDeveloperSnippet('prune', json, model, pruneOptions);
 
         // Natural Language
         const natural = npmToNatural(json);
         document.getElementById('naturalOutput').textContent = natural;
         document.getElementById('naturalAnalysis').innerHTML = formatTokenSummary(json, natural, 'Natural-language transformation', model);
+        document.getElementById('naturalSnippet').textContent = formatDeveloperSnippet('natural', json, model);
 
         // TOON
         const toon = npmToTOON(json);
@@ -1343,6 +1445,7 @@
           npmAnalyze(json, { ...analyzeOpts, toTOON: true }),
           'TOON conversion'
         );
+        document.getElementById('toonSnippet').textContent = formatDeveloperSnippet('toon', json, model);
 
         clearError();
       } catch (e) {
@@ -1417,6 +1520,18 @@
       });
     }
 
+    function copySnippet(operation) {
+      const element = document.getElementById(`${operation}Snippet`);
+      navigator.clipboard.writeText(element.textContent).then(() => {
+        const btn = event.target;
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.textContent = original;
+        }, 2000);
+      });
+    }
+
     function applyInputToTabs() {
       processAndDisplay();
     }
@@ -1428,6 +1543,9 @@
       });
       document.querySelectorAll('.analysis-box').forEach(box => {
         box.innerHTML = 'Enter valid JSON to see analysis';
+      });
+      document.querySelectorAll('.developer-snippet pre').forEach(box => {
+        box.textContent = 'Enter valid JSON to generate a snippet';
       });
     }
 
@@ -1443,7 +1561,7 @@
     }
 
     // Module-scoped functions need explicit globals for the existing inline handlers.
-    Object.assign(window, { showTab, copyOutput, applyInputToTabs, clearInput });
+    Object.assign(window, { showTab, copyOutput, copySnippet, applyInputToTabs, clearInput });
 
     // ========== EVENT LISTENERS ==========
 
