@@ -849,10 +849,6 @@
           <div class="info-box">Inspect the input size and structure without transforming the data.</div>
           <div class="result-stack">
             <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="analyzeInput">Enter valid JSON to inspect</div>
-            </div>
-            <div class="result-card">
               <div class="result-label">Input overview</div>
               <div class="analysis-box" id="analyzeAnalysis">Enter valid JSON to inspect</div>
             </div>
@@ -862,12 +858,8 @@
 
         <!-- Compact Tab -->
         <div id="compact" class="tab-content">
-          <div class="info-box">See the input JSON, the compacted result, and the estimated savings.</div>
+          <div class="info-box">See the compacted result and estimated savings for the current JSON.</div>
           <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="compactInput">Enter valid JSON to compact</div>
-            </div>
             <div class="result-card">
               <div class="result-label">After (Compact)</div>
               <div class="output-box" id="compactOutput">Enter valid JSON to compact</div>
@@ -882,12 +874,8 @@
 
         <!-- Flatten Tab -->
         <div id="flatten" class="tab-content">
-          <div class="info-box">Flatten nested objects into a dot-notation view and compare it against the source payload.</div>
+          <div class="info-box">Flatten nested objects into a dot-notation view for the current JSON.</div>
           <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="flattenInput">Enter valid JSON to flatten</div>
-            </div>
             <div class="result-card">
               <div class="result-label">After (Flatten)</div>
               <div class="output-box" id="flattenOutput">Enter valid JSON to flatten</div>
@@ -924,10 +912,6 @@
           </div>
           <div class="result-stack">
             <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="pruneInput">Enter valid JSON to prune</div>
-            </div>
-            <div class="result-card">
               <div class="result-label">After (Prune)</div>
               <div class="output-box" id="pruneOutput">Enter valid JSON to prune</div>
             </div>
@@ -941,12 +925,8 @@
 
         <!-- Natural Tab -->
         <div id="natural" class="tab-content">
-          <div class="info-box">Convert your JSON into natural-language context and compare the length of the original payload with the rewritten version.</div>
+          <div class="info-box">Convert the current JSON into natural-language context and compare the result size.</div>
           <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="naturalInput">Enter valid JSON to convert</div>
-            </div>
             <div class="result-card">
               <div class="result-label">After (Natural)</div>
               <div class="output-box" id="naturalOutput">Enter valid JSON to convert</div>
@@ -963,10 +943,6 @@
         <div id="toon" class="tab-content">
           <div class="info-box">Turn object arrays into a compact TOON-style layout and inspect how much structure it preserves.</div>
           <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="toonInput">Enter valid JSON to convert</div>
-            </div>
             <div class="result-card">
               <div class="result-label">After (TOON)</div>
               <div class="output-box" id="toonOutput">Enter valid JSON to convert</div>
@@ -1330,19 +1306,16 @@
         const analyzeOpts = { exact: true, model, fallbackToHeuristic: true };
 
         // Inspect input without applying an optimization.
-        document.getElementById('analyzeInput').textContent = inputText;
         document.getElementById('analyzeAnalysis').innerHTML = formatInputOverview(json, model);
 
         // Compact
         const compacted = npmCompact(json);
         const compactedText = typeof compacted === 'string' ? compacted : JSON.stringify(compacted, null, 2);
-        document.getElementById('compactInput').textContent = inputText;
         document.getElementById('compactOutput').textContent = compactedText;
         document.getElementById('compactAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, compact: true }), 'Compacting');
 
         // Flatten
         const flattened = npmFlatten(json);
-        document.getElementById('flattenInput').textContent = inputText;
         document.getElementById('flattenOutput').textContent = JSON.stringify(flattened, null, 2);
         document.getElementById('flattenAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, flatten: true }), 'Flattening');
 
@@ -1355,19 +1328,16 @@
           removeEmptyArrays: pruneState.rules.has('removeEmptyArrays'),
         };
         const pruned = npmPrune(json, pruneOptions);
-        document.getElementById('pruneInput').textContent = inputText;
         document.getElementById('pruneOutput').textContent = JSON.stringify(pruned, null, 2);
         document.getElementById('pruneAnalysis').innerHTML = formatTokenSummary(json, pruned, 'Pruning');
 
         // Natural Language
         const natural = npmToNatural(json);
-        document.getElementById('naturalInput').textContent = inputText;
         document.getElementById('naturalOutput').textContent = natural;
         document.getElementById('naturalAnalysis').innerHTML = formatTokenSummary(json, natural, 'Natural-language transformation', model);
 
         // TOON
         const toon = npmToTOON(json);
-        document.getElementById('toonInput').textContent = inputText;
         document.getElementById('toonOutput').textContent = toon;
         document.getElementById('toonAnalysis').innerHTML = formatAnalysisSummary(
           npmAnalyze(json, { ...analyzeOpts, toTOON: true }),
