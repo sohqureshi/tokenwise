@@ -139,7 +139,7 @@ function buildSemanticStory(obj: Record<string, any>): string | null {
   }
 
   const subject = findSubject(obj);
-  const stateEntry = findEntry(obj, [
+  const stateEntry = findSemanticEntry(obj, [
     "status",
     "state",
     "condition",
@@ -174,17 +174,72 @@ function buildSemanticStory(obj: Record<string, any>): string | null {
 }
 
 function findSubject(obj: Record<string, any>): { key: string; value: string } | null {
-  const subjectKeys = ["name", "title", "label", "ownerName", "customerName", "accountName"];
+  const subjectKeys = [
+    "name",
+    "title",
+    "label",
+    "displayName",
+    "entityName",
+    "fullName",
+    "userName",
+    "username",
+    "personName",
+    "customerName",
+    "clientName",
+    "ownerName",
+    "accountName",
+    "companyName",
+    "organizationName",
+    "teamName",
+    "departmentName",
+    "projectName",
+    "productName",
+    "serviceName",
+    "resourceName",
+    "fileName",
+    "deviceName",
+    "hostName",
+    "applicationName",
+    "appName",
+    "taskName",
+    "eventName",
+    "itemName",
+    "orderName",
+    "patientName",
+    "employeeName",
+  ];
+  const entries = Object.entries(obj);
+
+  // Prefer explicit subject names so a dynamic key cannot override a clearer match.
   for (const key of subjectKeys) {
     if (typeof obj[key] === "string" && obj[key].trim()) {
       return { key, value: obj[key].trim() };
     }
   }
+
+  // Support schemas such as patientName or billingContactName without requiring
+  // every possible domain-specific subject key to be listed above.
+  const nameEntry = entries.find(([key, value]) => {
+    return key.toLowerCase().includes("name") &&
+      typeof value === "string" &&
+      value.trim().length > 0;
+  });
+  if (nameEntry) {
+    return { key: nameEntry[0], value: nameEntry[1].trim() };
+  }
+
   return null;
 }
 
-function findEntry(obj: Record<string, any>, keys: string[]): [string, any] | null {
-  return Object.entries(obj).find(([key]) => keys.includes(key)) ?? null;
+function findSemanticEntry(obj: Record<string, any>, keys: string[]): [string, any] | null {
+  const entries = Object.entries(obj);
+  const exactEntry = entries.find(([key]) => keys.includes(key));
+  if (exactEntry) return exactEntry;
+
+  return entries.find(([key]) => {
+    const normalizedKey = key.toLowerCase();
+    return keys.some((semanticKey) => normalizedKey.includes(semanticKey.toLowerCase()));
+  }) ?? null;
 }
 
 function shouldDescribeSemantically(key: string, value: unknown): boolean {

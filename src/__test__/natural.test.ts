@@ -106,6 +106,115 @@ describe('toNatural', () => {
     )
   })
 
+  it.each([
+    ['displayName', 'Checkout API'],
+    ['entityName', 'Invoice 42'],
+    ['fullName', 'Sam Rivera'],
+    ['projectName', 'Apollo'],
+    ['productName', 'Wireless keyboard'],
+    ['serviceName', 'Payments'],
+    ['deviceName', 'Gateway 3'],
+    ['patientName', 'Maya Patel'],
+    ['taskName', 'Deploy release']
+  ])('recognizes %s as a dynamic subject field', (subjectKey, subjectValue) => {
+    const output = toNatural({
+      [subjectKey]: subjectValue,
+      status: "active"
+    })
+
+    expect(output).toBe(`${subjectValue} is active.`)
+  })
+
+  it.each([
+    ['patientName', 'Maya Patel'],
+    ['billingContactName', 'Ravi Shah'],
+    ['primaryOwnerName', 'Alex Morgan']
+  ])('matches dynamic subject keys containing name: %s', (subjectKey, subjectValue) => {
+    const output = toNatural({
+      [subjectKey]: subjectValue,
+      state: "active"
+    })
+
+    expect(output).toBe(`${subjectValue} is active.`)
+  })
+
+  it.each([
+    ['orderStatus', 'shipped'],
+    ['currentPhase', 'review'],
+    ['customerRole', 'admin'],
+    ['incidentSeverity', 'high']
+  ])('matches dynamic state keys containing a semantic key: %s', (stateKey, stateValue) => {
+    const output = toNatural({
+      name: "Record 42",
+      [stateKey]: stateValue
+    })
+
+    expect(output).toBe(`Record 42 is ${stateValue}.`)
+  })
+
+  it.each([
+    ['state', 'active'],
+    ['condition', 'healthy'],
+    ['stage', 'review'],
+    ['role', 'admin'],
+    ['category', 'hardware'],
+    ['availability', 'in stock'],
+    ['progress', 'complete'],
+    ['severity', 'critical']
+  ])('uses %s as a dynamic entity state field', (stateKey, stateValue) => {
+    const output = toNatural({
+      name: "Service account",
+      [stateKey]: stateValue
+    })
+
+    expect(output).toBe(`Service account is ${stateValue}.`)
+  })
+
+  it('describes dynamic scalar details while excluding technical metadata', () => {
+    const output = toNatural({
+      name: "Build 17",
+      status: "failed",
+      retryCount: 2,
+      automated: false,
+      id: "build-17",
+      createdAt: "2026-09-13T10:00:00Z",
+      debug: true
+    })
+
+    expect(output).toBe(
+      "Build 17 is failed and has retry count 2, automated disabled."
+    )
+  })
+
+  it('uses semantic phrasing for an entity nested inside a wrapper object', () => {
+    const output = toNatural({
+      result: {
+        label: "Deployment",
+        phase: "complete",
+        region: "eu-west-1"
+      },
+      requestId: "req-42"
+    })
+
+    expect(output).toBe("Deployment is complete and has region eu-west-1.")
+  })
+
+  it('keeps policy sentences concise when optional details are missing', () => {
+    const output = toNatural({
+      holderName: "Jordan Lee",
+      policyNumber: "POL-100"
+    })
+
+    expect(output).toBe("Jordan Lee has policy POL-100.")
+  })
+
+  it('handles primitive, empty, and mixed array inputs', () => {
+    expect(toNatural(null)).toBe("nothing")
+    expect(toNatural(true)).toBe("yes")
+    expect(toNatural([])).toBe("empty list")
+    expect(toNatural(["alpha", 2, false])).toBe("alpha, 2 and no")
+  })
+
   it('should convert multiple medical appointment records into numbered pointers', () => {
     const input = [
       {
