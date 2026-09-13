@@ -199,6 +199,18 @@ describe('toNatural', () => {
     expect(output).toBe("Deployment is complete and has region eu-west-1.")
   })
 
+  it('does not discard sibling data when a wrapper has multiple entities', () => {
+    const output = toNatural({
+      project: { name: "Apollo", status: "active" },
+      incident: { title: "Incident 42", severity: "high" }
+    })
+
+    expect(output).toContain("project:")
+    expect(output).toContain("incident:")
+    expect(output).toContain("name Apollo")
+    expect(output).toContain("severity high")
+  })
+
   it('keeps policy sentences concise when optional details are missing', () => {
     const output = toNatural({
       holderName: "Jordan Lee",
