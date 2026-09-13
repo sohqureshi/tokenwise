@@ -20,7 +20,7 @@ export type AnalyzeOptions = {
 
 export function analyze(input: unknown, options: AnalyzeOptions = {}) {
   const {
-    exact = false,
+    exact = true,
     model = "gpt-4o-mini",
     fallbackToHeuristic = true,
   } = options;
@@ -100,4 +100,3 @@ export function analyze(input: unknown, options: AnalyzeOptions = {}) {
     estimator: estimatorLabel,
   };
 }
-

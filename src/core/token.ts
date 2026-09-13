@@ -1,12 +1,3 @@
-/**
- * Estimates token count from string length.
- *
- * Approximation:
- * 1 token ≈ 4 characters (common for GPT models)
- *
- * @param text - Input string
- * @returns Estimated token count
- */
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
@@ -16,6 +7,17 @@ export interface TokenEstimateOptions {
   model?: string;
   fallbackToHeuristic?: boolean;
 }
+
+type TokenEncoder = {
+  encode: (text: string) => { length: number };
+  free?: () => void;
+  name?: string;
+};
+
+type TiktokenModule = {
+  encoding_for_model: (model: string) => TokenEncoder;
+  model_to_encoding?: (model: string) => string;
+};
 
 export function serializeForTokenEstimate(value: unknown): string {
   if (typeof value === "string") return value;
@@ -28,26 +30,34 @@ function estimateTokensHeuristic(value: unknown): number {
   return Math.ceil(serializeForTokenEstimate(value).length / 4);
 }
 
-function estimateTokensExact(value: unknown, model: string): number | null {
-  try {
-    const tiktoken = require("tiktoken");
-    const encoder = tiktoken.encoding_for_model(model);
-    const text = serializeForTokenEstimate(value);
-    return encoder.encode(text).length;
-  } catch (error) {
-    return null;
+function expectedEncodingForModel(model: string): string {
+  const normalizedModel = model.toLowerCase();
+
+  if (
+    normalizedModel.includes("gpt-4o") ||
+    normalizedModel.includes("gpt-4.1") ||
+    normalizedModel.includes("o1") ||
+    normalizedModel.includes("o3") ||
+    normalizedModel.includes("o4")
+  ) {
+    return "o200k_base";
   }
+
+  if (
+    normalizedModel.includes("davinci") ||
+    normalizedModel.startsWith("text-") ||
+    normalizedModel.includes("babbage") ||
+    normalizedModel.includes("curie")
+  ) {
+    return "r50k_base";
+  }
+
+  return "cl100k_base";
 }
 
-/**
- * Estimates tokens using a transparent four-characters-per-token heuristic.
- * JSON values are serialized first, matching the compact form normally sent
- * to an API. Set exact=true to attempt a model-specific tokenizer count when
- * the runtime has the tokenizer installed.
- */
 export type TokenEstimateResult = {
   count: number;
-  estimator: string; // human-readable estimator metadata (encoding/model or heuristic)
+  estimator: string;
 };
 
 export function estimateTokens(
@@ -58,16 +68,14 @@ export function estimateTokens(
 }
 
 /**
- * Returns both a token count and an estimator string describing how the count was
- * obtained (exact tokenizer + encoding when available, or heuristic otherwise).
+ * Returns an exact model tokenizer count by default. Set exact=false to use the
+ * lightweight four-characters-per-token fallback explicitly.
  */
 export function estimateTokensWithMeta(
   value: unknown,
   options: TokenEstimateOptions = {}
 ): TokenEstimateResult {
-  const { exact = false, model = "gpt-4o-mini", fallbackToHeuristic = true } = options;
-
-  // Heuristic result
+  const { exact = true, model = "gpt-4o-mini", fallbackToHeuristic = true } = options;
   const heuristic = estimateTokensHeuristic(value);
   const heuristicEstimator = "heuristic: 1 token ≈ 4 characters";
 
@@ -75,50 +83,40 @@ export function estimateTokensWithMeta(
     return { count: heuristic, estimator: heuristicEstimator };
   }
 
-  // Try exact tokenizer via tiktoken; gracefully fall back to heuristic if anything fails
   try {
-    const tiktoken = require("tiktoken");
-    // Try to get an encoder for the model; encoding_for_model will throw if unsupported
+    const tiktoken = require("tiktoken") as TiktokenModule;
     const encoder = tiktoken.encoding_for_model(model);
-    const text = serializeForTokenEstimate(value);
-    const count = encoder.encode(text).length;
+    const count = encoder.encode(serializeForTokenEstimate(value)).length;
+    let encodingName = encoder.name;
 
-    // Attempt to infer an encoding name for display. Some tiktoken builds expose the
-    // encoding name on the encoder; try common properties, otherwise fall back to
-    // a conservative mapping based on model name.
-    let encodingName: string | null = null;
-    if ((encoder as any).name) encodingName = (encoder as any).name;
-    if (!encodingName && typeof (tiktoken as any).model_to_encoding === 'function') {
+    if (!encodingName && typeof tiktoken.model_to_encoding === "function") {
       try {
-        encodingName = (tiktoken as any).model_to_encoding(model);
-      } catch (e) {
-        encodingName = null;
+        encodingName = tiktoken.model_to_encoding(model);
+      } catch {
+        encodingName = undefined;
       }
     }
 
-    if (!encodingName) {
-      const m = String(model || '').toLowerCase();
-      if (m.includes('davinci') || m.startsWith('text-')) encodingName = 'r50k_base';
-      else encodingName = 'cl100k_base';
-    }
+    encodingName ??= expectedEncodingForModel(model);
+    encoder.free?.();
 
-    const estimator = `exact tokenizer: model=${model} encoding=${encodingName}`;
-    return { count, estimator };
-  } catch (e) {
-    // tiktoken not available or failed — prepare a helpful estimator string that still
-    // reports the model and the expected encoding. Return heuristic count but expose
-    // the expected encoding so the demo can show the selected tokenizer metadata.
-    const m = String(model || '').toLowerCase();
-    const expectedEncoding = (m.includes('davinci') || m.startsWith('text-')) ? 'r50k_base' : 'cl100k_base';
+    return {
+      count,
+      estimator: `exact tokenizer: model=${model} encoding=${encodingName}`,
+    };
+  } catch {
+    const expectedEncoding = expectedEncodingForModel(model);
 
     if (!fallbackToHeuristic) {
-      // If caller requested exact and no fallback, indicate tokenizer unavailable but
-      // include expected encoding for clarity.
-      return { count: heuristic, estimator: `exact requested but tokenizer unavailable (expected encoding=${expectedEncoding} for model=${model})` };
+      return {
+        count: heuristic,
+        estimator: `exact requested but tokenizer unavailable (expected encoding=${expectedEncoding} for model=${model})`,
+      };
     }
 
-    // Fallback with informative estimator
-    const fallbackEstimator = `heuristic: 1 token ≈ 4 characters (model=${model} expected_encoding=${expectedEncoding})`;
-    return { count: heuristic, estimator: fallbackEstimator };
+    return {
+      count: heuristic,
+      estimator: `${heuristicEstimator} (model=${model} expected_encoding=${expectedEncoding})`,
+    };
   }
 }

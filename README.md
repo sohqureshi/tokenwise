@@ -210,10 +210,11 @@ LLMs charge and reason over tokens. Sending raw JSON often includes repeated key
 node demo.js
 ```
 
-Use `--analyze` to compare serialized input and output with TokenWise's
-four-characters-per-token heuristic. For model-accurate counts, pass
-`exact: true` and a `model` name to `estimateTokens()` or `analyze()`.
-This is still only as exact as the tokenizer implementation you use.
+Use `--analyze` to compare serialized input and output with the model's
+`tiktoken` encoding. `estimateTokens()` and `analyze()` use exact
+model-aware counts by default; pass `exact: false` to opt into the
+four-characters-per-token heuristic. Use `model` to select the tokenizer
+used by `tiktoken`.
 
 ---
 

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { encoding_for_model } from 'tiktoken';
 import { analyze } from '../core/analyze';
 
 describe('analyze()', () => {
@@ -8,7 +9,9 @@ describe('analyze()', () => {
     const result = analyze(input);
 
     expect(result.savings).toBeGreaterThanOrEqual(0);
-    expect(result.originalTokens).toBe(Math.ceil(JSON.stringify(input).length / 4));
+    expect(result.originalTokens).toBe(
+      encoding_for_model('gpt-4o-mini').encode(JSON.stringify(input)).length
+    );
     expect(result.optimizedTokens).toBeGreaterThanOrEqual(0);
     expect(result.savingsPercent).toBeGreaterThanOrEqual(0);
   });
@@ -19,7 +22,7 @@ describe('analyze()', () => {
 
     expect(result.originalTokens).toBeGreaterThan(0);
     expect(result.originalCharacters).toBe(JSON.stringify(input).length);
-    expect(result.estimator).toContain('heuristic');
+    expect(result.estimator).toContain('exact tokenizer');
   });
 
   it('should return 0 savings when no optimization is applied', () => {

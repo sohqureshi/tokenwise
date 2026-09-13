@@ -8,10 +8,16 @@ describe('token estimation', () => {
     const serialized = JSON.stringify(input)
 
     expect(serializeForTokenEstimate(input)).toBe(serialized)
-    expect(estimateTokens(input)).toBe(Math.ceil(serialized.length / 4))
+    const expected = encoding_for_model('gpt-4o-mini').encode(serialized).length
+    expect(estimateTokens(input)).toBe(expected)
   })
 
-  it('supports exact model-aware token estimation when available', () => {
+  it('supports the heuristic as an explicit opt-out', () => {
+    const input = 'The quick brown fox jumps over the lazy dog.'
+    expect(estimateTokens(input, { exact: false })).toBe(Math.ceil(input.length / 4))
+  })
+
+  it('supports exact model-aware token estimation', () => {
     const input = 'The quick brown fox jumps over the lazy dog.'
     const expected = encoding_for_model('gpt-4o-mini').encode(input).length
 
