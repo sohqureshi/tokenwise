@@ -8,6 +8,15 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <script type="importmap">
+    {
+      "imports": {
+        "module": "https://esm.sh/node/module.mjs",
+        "node:module": "https://esm.sh/node/module.mjs"
+      }
+    }
+  </script>
+
   <style>
     :root {
       --primary: #38bdf8;
@@ -866,7 +875,7 @@
       estimateTokens: npmEstimateTokens,
       toNatural: npmToNatural,
       toTOON: npmToTOON,
-    } = await import(`https://esm.sh/@sohqureshi/tokenwise@${libraryVersion}`);
+    } = await import(`https://cdn.jsdelivr.net/npm/@sohqureshi/tokenwise@${libraryVersion}/dist/index.js`);
 
     // Lightweight JSON validation helpers used by the demo UI.
     function isValidJSON(str) {
