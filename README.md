@@ -236,6 +236,12 @@ used by `tiktoken`.
 
 ## Release Notes
 
+### v1.0.11 — 2026-09-13
+
+- Preserve sibling entities when formatting wrapped JSON objects.
+- Replace the demo's noisy sample with a meaningful dynamic workspace, incident, and order example.
+- Update the browser demo to use the v1.0.11 CDN package.
+
 ### v1.0.10 — 2026-09-13
 
 - Add conservative contains-based semantic matching for dynamic subject and state keys, including fields such as `patientName`, `orderStatus`, and `incidentSeverity`.
