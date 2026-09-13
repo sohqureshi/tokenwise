@@ -171,6 +171,40 @@
       line-height: 1.45;
     }
 
+    .prune-options {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.45);
+    }
+
+    .prune-options-title {
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .prune-options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #cbd5e1;
+      font-size: 0.82rem;
+    }
+
+    .prune-options select {
+      width: 100%;
+      min-height: 112px;
+      padding: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 7px;
+      background: #1e2937;
+      color: #e2e8f0;
+      font: inherit;
+    }
+
     #jsonInput {
       flex: 1;
       background: #1e2937;
@@ -787,7 +821,17 @@
 
         <!-- Prune Tab -->
         <div id="prune" class="tab-content active">
-          <div class="info-box">Remove noise such as ids, debug fields, and internal metadata before prompting an LLM.</div>
+          <div class="info-box">Remove noise such as ids, debug fields, and internal metadata before prompting an LLM. Change these options, then apply the current JSON to compare the result.</div>
+          <div class="prune-options">
+            <div class="prune-options-title">Prune options</div>
+            <label for="pruneRemoveKeys">Remove keys (Ctrl/Cmd-click to select multiple)</label>
+            <select id="pruneRemoveKeys" multiple aria-label="Keys to remove"></select>
+            <div class="input-help">Keys are detected from the current JSON. Technical keys are recommended automatically.</div>
+            <label><input id="pruneRemoveNull" type="checkbox" checked> Remove null values</label>
+            <label><input id="pruneRemoveUndefined" type="checkbox" checked> Remove undefined values</label>
+            <label><input id="pruneRemoveEmptyObjects" type="checkbox" checked> Remove empty objects</label>
+            <label><input id="pruneRemoveEmptyArrays" type="checkbox"> Remove empty arrays</label>
+          </div>
           <div class="result-stack">
             <div class="result-card">
               <div class="result-label">Input JSON</div>
@@ -1067,12 +1111,54 @@
       `;
     }
 
+    const recommendedPruneKeys = new Set([
+      'id',
+      'debug',
+      'internal',
+      'metadata',
+      'apiKey',
+      'timestamp',
+      'createdAt',
+      'updatedAt'
+    ]);
+
+    function collectObjectKeys(value, keys = new Set()) {
+      if (Array.isArray(value)) {
+        value.forEach((item) => collectObjectKeys(item, keys));
+      } else if (value && typeof value === 'object') {
+        Object.entries(value).forEach(([key, child]) => {
+          keys.add(key);
+          collectObjectKeys(child, keys);
+        });
+      }
+      return keys;
+    }
+
+    function refreshPruneKeyOptions(value) {
+      const select = document.getElementById('pruneRemoveKeys');
+      const previousSelection = new Set(
+        Array.from(select.selectedOptions).map((option) => option.value)
+      );
+      const hasPreviousSelection = select.options.length > 0;
+      const keys = Array.from(collectObjectKeys(value)).sort((a, b) => a.localeCompare(b));
+      select.replaceChildren(...keys.map((key) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = recommendedPruneKeys.has(key) ? `${key} (recommended)` : key;
+        option.selected = hasPreviousSelection
+          ? previousSelection.has(key)
+          : recommendedPruneKeys.has(key);
+        return option;
+      }));
+    }
+
     function processAndDisplay() {
       const json = getInputJSON();
       if (!json) return;
 
       try {
         // All transformations intentionally share this parsed editor value.
+        refreshPruneKeyOptions(json);
         const inputText = JSON.stringify(json, null, 2);
         const selectedModelEl = document.getElementById('modelSelect');
         const model = selectedModelEl ? selectedModelEl.value : 'gpt-4';
@@ -1096,10 +1182,18 @@
         document.getElementById('flattenAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, flatten: true }), 'Flattening');
 
         // Prune
-        const pruned = npmPrune(json, { removeKeys: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] });
+        const pruneOptions = {
+          removeKeys: Array.from(document.getElementById('pruneRemoveKeys').selectedOptions)
+            .map((option) => option.value),
+          removeNull: document.getElementById('pruneRemoveNull').checked,
+          removeUndefined: document.getElementById('pruneRemoveUndefined').checked,
+          removeEmptyObjects: document.getElementById('pruneRemoveEmptyObjects').checked,
+          removeEmptyArrays: document.getElementById('pruneRemoveEmptyArrays').checked,
+        };
+        const pruned = npmPrune(json, pruneOptions);
         document.getElementById('pruneInput').textContent = inputText;
         document.getElementById('pruneOutput').textContent = JSON.stringify(pruned, null, 2);
-        document.getElementById('pruneAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, prune: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] }), 'Pruning');
+        document.getElementById('pruneAnalysis').innerHTML = formatTokenSummary(json, pruned, 'Pruning');
 
         // Natural Language
         const natural = npmToNatural(json);
@@ -1223,6 +1317,9 @@
     input.addEventListener('input', processAndDisplay);
     input.addEventListener('change', processAndDisplay);
     document.getElementById('modelSelect').addEventListener('change', processAndDisplay);
+    document.querySelectorAll('#prune input').forEach((control) => {
+      control.addEventListener('change', processAndDisplay);
+    });
 
     // Process the starter JSON and activate the URL-driven tab on page load
     window.addEventListener('load', () => {

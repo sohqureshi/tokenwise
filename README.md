@@ -166,6 +166,36 @@ Matching is case-insensitive and also supports keys that contain these
 concepts, such as `patientName`, `orderStatus`, `currentPhase`, or
 `incidentSeverity`.
 
+### `prune()`
+
+Removes selected keys and optionally removes null, undefined, empty-object, or
+empty-array values. The defaults remove null and undefined values and empty
+objects, while preserving empty arrays.
+
+```ts
+type PruneOptions = {
+  removeKeys?: string[];
+  removeNull?: boolean;
+  removeUndefined?: boolean;
+  removeEmptyObjects?: boolean;
+  removeEmptyArrays?: boolean;
+};
+
+prune(input, {
+  removeKeys: ["id", "debug", "internal"],
+  removeNull: true,
+  removeUndefined: true,
+  removeEmptyObjects: true,
+  removeEmptyArrays: false
+});
+```
+
+The browser demo exposes the same options in the Prune tab. It automatically
+detects unique keys across the current JSON (including nested objects and
+arrays), recommends common technical keys, and provides a multi-select control
+for choosing exactly which keys to remove. The cleanup toggles are available
+alongside the key selector.
+
 ### `toTOON()`
 
 Converts JSON into a compact TOON-like text format. Arrays of objects become table-style rows.
