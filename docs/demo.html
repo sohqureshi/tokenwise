@@ -194,6 +194,87 @@
       font-size: 0.82rem;
     }
 
+    .tag-dropdown {
+      position: relative;
+    }
+
+    .tag-dropdown-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 40px;
+      padding: 7px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 7px;
+      background: #1e2937;
+      color: #e2e8f0;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .tag-dropdown-toggle::after {
+      content: "▾";
+      color: #94a3b8;
+    }
+
+    .tag-dropdown-menu {
+      display: none;
+      position: absolute;
+      z-index: 5;
+      width: 100%;
+      max-height: 220px;
+      overflow-y: auto;
+      margin-top: 4px;
+      padding: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 7px;
+      background: #0f172a;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .tag-dropdown.open .tag-dropdown-menu {
+      display: grid;
+      gap: 4px;
+    }
+
+    .tag-dropdown-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 5px;
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .tag-dropdown-option:hover {
+      background: rgba(148, 163, 184, 0.12);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.18);
+      color: #bae6fd;
+      font-size: 0.75rem;
+    }
+
+    .tag-empty {
+      color: #94a3b8;
+      font-size: 0.82rem;
+    }
+
     .prune-options select {
       width: 100%;
       min-height: 112px;
@@ -824,13 +905,22 @@
           <div class="info-box">Remove noise such as ids, debug fields, and internal metadata before prompting an LLM. Change these options, then apply the current JSON to compare the result.</div>
           <div class="prune-options">
             <div class="prune-options-title">Prune options</div>
-            <label for="pruneRemoveKeys">Remove keys (Ctrl/Cmd-click to select multiple)</label>
-            <select id="pruneRemoveKeys" multiple aria-label="Keys to remove"></select>
+            <label for="pruneRemoveKeys">Remove keys</label>
+            <div class="tag-dropdown" id="pruneRemoveKeys">
+              <button class="tag-dropdown-toggle" type="button" aria-expanded="false">
+                <span class="tag-list" data-tags></span>
+              </button>
+              <div class="tag-dropdown-menu" data-options></div>
+            </div>
             <div class="input-help">Keys are detected from the current JSON. Technical keys are recommended automatically.</div>
-            <label><input id="pruneRemoveNull" type="checkbox" checked> Remove null values</label>
-            <label><input id="pruneRemoveUndefined" type="checkbox" checked> Remove undefined values</label>
-            <label><input id="pruneRemoveEmptyObjects" type="checkbox" checked> Remove empty objects</label>
-            <label><input id="pruneRemoveEmptyArrays" type="checkbox"> Remove empty arrays</label>
+            <label for="pruneRules">Cleanup rules</label>
+            <div class="tag-dropdown" id="pruneRules">
+              <button class="tag-dropdown-toggle" type="button" aria-expanded="false">
+                <span class="tag-list" data-tags></span>
+              </button>
+              <div class="tag-dropdown-menu" data-options></div>
+            </div>
+            <div class="input-help">Select one or more rules; changes update Prune immediately.</div>
           </div>
           <div class="result-stack">
             <div class="result-card">
@@ -1121,6 +1211,17 @@
       'createdAt',
       'updatedAt'
     ]);
+    const pruneRuleLabels = {
+      removeNull: 'Remove null values',
+      removeUndefined: 'Remove undefined values',
+      removeEmptyObjects: 'Remove empty objects',
+      removeEmptyArrays: 'Remove empty arrays'
+    };
+    const pruneState = {
+      removeKeys: new Set(),
+      rules: new Set(['removeNull', 'removeUndefined', 'removeEmptyObjects']),
+      keysInitialized: false
+    };
 
     function collectObjectKeys(value, keys = new Set()) {
       if (Array.isArray(value)) {
@@ -1135,21 +1236,84 @@
     }
 
     function refreshPruneKeyOptions(value) {
-      const select = document.getElementById('pruneRemoveKeys');
-      const previousSelection = new Set(
-        Array.from(select.selectedOptions).map((option) => option.value)
-      );
-      const hasPreviousSelection = select.options.length > 0;
       const keys = Array.from(collectObjectKeys(value)).sort((a, b) => a.localeCompare(b));
-      select.replaceChildren(...keys.map((key) => {
-        const option = document.createElement('option');
-        option.value = key;
-        option.textContent = recommendedPruneKeys.has(key) ? `${key} (recommended)` : key;
-        option.selected = hasPreviousSelection
-          ? previousSelection.has(key)
-          : recommendedPruneKeys.has(key);
-        return option;
+      const availableKeys = new Set(keys);
+      if (!pruneState.keysInitialized) {
+        keys.filter((key) => recommendedPruneKeys.has(key))
+          .forEach((key) => pruneState.removeKeys.add(key));
+        pruneState.keysInitialized = true;
+      } else {
+        pruneState.removeKeys.forEach((key) => {
+          if (!availableKeys.has(key)) pruneState.removeKeys.delete(key);
+        });
+      }
+      renderTagDropdown(
+        'pruneRemoveKeys',
+        keys,
+        pruneState.removeKeys,
+        (key, selected) => {
+          if (selected) pruneState.removeKeys.add(key);
+          else pruneState.removeKeys.delete(key);
+          processAndDisplay();
+        },
+        (key) => recommendedPruneKeys.has(key) ? `${key} (recommended)` : key
+      );
+    }
+
+    function renderTagDropdown(id, options, selected, onChange, getLabel = (option) => option) {
+      const dropdown = document.getElementById(id);
+      const tags = dropdown.querySelector('[data-tags]');
+      const menu = dropdown.querySelector('[data-options]');
+      tags.replaceChildren();
+      const selectedOptions = options.filter((option) => selected.has(option));
+      if (selectedOptions.length === 0) {
+        const empty = document.createElement('span');
+        empty.className = 'tag-empty';
+        empty.textContent = 'None selected';
+        tags.appendChild(empty);
+      } else {
+        selectedOptions.forEach((option) => {
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.textContent = getLabel(option);
+          tags.appendChild(tag);
+        });
+      }
+      menu.replaceChildren(...options.map((option) => {
+        const label = document.createElement('label');
+        label.className = 'tag-dropdown-option';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = selected.has(option);
+        checkbox.addEventListener('change', () => onChange(option, checkbox.checked));
+        label.append(checkbox, document.createTextNode(getLabel(option)));
+        return label;
       }));
+    }
+
+    function renderPruneRules() {
+      renderTagDropdown(
+        'pruneRules',
+        Object.keys(pruneRuleLabels),
+        pruneState.rules,
+        (rule, selected) => {
+          if (selected) pruneState.rules.add(rule);
+          else pruneState.rules.delete(rule);
+          processAndDisplay();
+        },
+        (rule) => pruneRuleLabels[rule]
+      );
+    }
+
+    function initializeTagDropdowns() {
+      document.querySelectorAll('.tag-dropdown-toggle').forEach((button) => {
+        button.addEventListener('click', () => {
+          const dropdown = button.parentElement;
+          const open = dropdown.classList.toggle('open');
+          button.setAttribute('aria-expanded', String(open));
+        });
+      });
+      renderPruneRules();
     }
 
     function processAndDisplay() {
@@ -1159,6 +1323,7 @@
       try {
         // All transformations intentionally share this parsed editor value.
         refreshPruneKeyOptions(json);
+        renderPruneRules();
         const inputText = JSON.stringify(json, null, 2);
         const selectedModelEl = document.getElementById('modelSelect');
         const model = selectedModelEl ? selectedModelEl.value : 'gpt-4';
@@ -1183,12 +1348,11 @@
 
         // Prune
         const pruneOptions = {
-          removeKeys: Array.from(document.getElementById('pruneRemoveKeys').selectedOptions)
-            .map((option) => option.value),
-          removeNull: document.getElementById('pruneRemoveNull').checked,
-          removeUndefined: document.getElementById('pruneRemoveUndefined').checked,
-          removeEmptyObjects: document.getElementById('pruneRemoveEmptyObjects').checked,
-          removeEmptyArrays: document.getElementById('pruneRemoveEmptyArrays').checked,
+          removeKeys: Array.from(pruneState.removeKeys),
+          removeNull: pruneState.rules.has('removeNull'),
+          removeUndefined: pruneState.rules.has('removeUndefined'),
+          removeEmptyObjects: pruneState.rules.has('removeEmptyObjects'),
+          removeEmptyArrays: pruneState.rules.has('removeEmptyArrays'),
         };
         const pruned = npmPrune(json, pruneOptions);
         document.getElementById('pruneInput').textContent = inputText;
@@ -1313,6 +1477,7 @@
 
     // ========== EVENT LISTENERS ==========
 
+    initializeTagDropdowns();
     const input = document.getElementById('jsonInput');
     input.addEventListener('input', processAndDisplay);
     input.addEventListener('change', processAndDisplay);
@@ -1321,11 +1486,9 @@
       control.addEventListener('change', processAndDisplay);
     });
 
-    // Process the starter JSON and activate the URL-driven tab on page load
-    window.addEventListener('load', () => {
-      processAndDisplay();
-      showTab(resolveTabFromURL(), null, { updateURL: false });
-    });
+    // Render the prefilled JSON immediately; async module loading may finish
+    // after the window load event has already fired.
+    showTab(resolveTabFromURL(), null, { updateURL: false });
   </script>
 
 </body>

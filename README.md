@@ -193,8 +193,9 @@ prune(input, {
 The browser demo exposes the same options in the Prune tab. It automatically
 detects unique keys across the current JSON (including nested objects and
 arrays), recommends common technical keys, and provides a multi-select control
-for choosing exactly which keys to remove. The cleanup toggles are available
-alongside the key selector.
+with removable tags for choosing exactly which keys to remove. Cleanup rules
+are also selected as tags from a dropdown, and each change immediately updates
+the prune output.
 
 ### `toTOON()`
 
