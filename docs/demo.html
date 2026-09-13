@@ -156,6 +156,12 @@
       font-weight: 500;
     }
 
+    .input-help {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      line-height: 1.45;
+    }
+
     #jsonInput {
       flex: 1;
       background: #1e2937;
@@ -647,6 +653,10 @@
           <span>JSON Input</span>
         </div>
         <div class="input-group">
+          <div class="input-help">
+            Start with the example below, then edit or replace it with your own
+            valid JSON. Every feature tab uses the current editor value.
+          </div>
           <textarea id="jsonInput" placeholder='{
   "product": {
     "name": "Wireless Headphones",
@@ -1041,6 +1051,7 @@
       if (!json) return;
 
       try {
+        // All transformations intentionally share this parsed editor value.
         const inputText = JSON.stringify(json, null, 2);
         const selectedModelEl = document.getElementById('modelSelect');
         const model = selectedModelEl ? selectedModelEl.value : 'gpt-4';
