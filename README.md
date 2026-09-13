@@ -234,6 +234,7 @@ used by `tiktoken`.
 - Correctly identify `o200k_base` for modern OpenAI models such as `gpt-4o`, `gpt-4.1`, `o1`, and `o3`.
 - Update the browser demo to use the v1.0.9 CDN package.
 - Make demo analysis actionable by showing signed token and character changes, the selected transformation, and an explanation of whether the result is cheaper or larger.
+- Rename the demo's input-only Analyze view to Inspect, showing input size and structure without applying a transformation.
 
 ---
 
