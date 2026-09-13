@@ -707,7 +707,7 @@
                 <option value="auto">Auto-detect</option>
               </select>
             </label>
-            <button class="btn" onclick="loadExample()"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span> Load Example</button>
+            <button class="btn" onclick="applyInputToTabs()"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8"/><path d="M8 8h8"/><path d="M5 4h1v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 4h-1v16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M8 20h8"/></svg></span>             Apply JSON to All Tabs</button>
             <button class="btn secondary" onclick="clearInput()"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M7 7l1 12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-12"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></span> Clear</button>
           </div>
         </div>
@@ -1189,10 +1189,7 @@
       });
     }
 
-    const initialExampleJSON = document.getElementById('jsonInput').value;
-
-    function loadExample() {
-      document.getElementById('jsonInput').value = initialExampleJSON;
+    function applyInputToTabs() {
       processAndDisplay();
     }
 
@@ -1218,7 +1215,7 @@
     }
 
     // Module-scoped functions need explicit globals for the existing inline handlers.
-    Object.assign(window, { showTab, copyOutput, loadExample, clearInput });
+    Object.assign(window, { showTab, copyOutput, applyInputToTabs, clearInput });
 
     // ========== EVENT LISTENERS ==========
 
@@ -1227,9 +1224,9 @@
     input.addEventListener('change', processAndDisplay);
     document.getElementById('modelSelect').addEventListener('change', processAndDisplay);
 
-    // Load example and activate URL-driven tab on page load
+    // Process the starter JSON and activate the URL-driven tab on page load
     window.addEventListener('load', () => {
-      loadExample();
+      processAndDisplay();
       showTab(resolveTabFromURL(), null, { updateURL: false });
     });
   </script>
