@@ -8,6 +8,15 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <script type="importmap">
+    {
+      "imports": {
+        "module": "https://esm.sh/node/module.mjs",
+        "node:module": "https://esm.sh/node/module.mjs"
+      }
+    }
+  </script>
+
   <style>
     :root {
       --primary: #38bdf8;
@@ -76,6 +85,18 @@
       font-size: 1.1rem;
     }
 
+    .library-version {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 6px 10px;
+      border: 1px solid rgba(96, 165, 250, 0.35);
+      border-radius: 999px;
+      color: #bfdbfe;
+      background: rgba(30, 64, 175, 0.2);
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+    }
+
     .demo-layout {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -142,6 +163,12 @@
       font-size: 0.9rem;
       color: #cbd5e1;
       font-weight: 500;
+    }
+
+    .input-help {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      line-height: 1.45;
     }
 
     #jsonInput {
@@ -623,6 +650,7 @@
     <div class="header">
       <h1>Interactive Demo</h1>
       <p>Paste your JSON below and explore all features in real-time</p>
+      <span class="library-version" id="libraryVersion">TokenWise npm: resolving latest...</span>
     </div>
 
     <!-- Demo Layout -->
@@ -634,24 +662,40 @@
           <span>JSON Input</span>
         </div>
         <div class="input-group">
-          <textarea id="jsonInput" placeholder='{
-  "product": {
-    "name": "Wireless Headphones",
-    "price": 79.99
+          <div class="input-help">
+            Start with the example below, then edit or replace it with your own
+            valid JSON. Every feature tab uses the current editor value.
+          </div>
+          <textarea id="jsonInput">{
+  "workspace": {
+    "displayName": "Apollo Checkout",
+    "status": "active",
+    "ownerName": "Platform Team",
+    "region": "eu-west-1"
   },
-  "users": [
-    { "id": 1, "name": "Ali" },
-    { "id": 2, "name": "John" }
-  ],
-  "policy": {
-    "holderName": "Carlos Rivera",
-    "policyNumber": "HLT-2048",
-    "claim": {
-      "status": "under review",
-      "requestedAmount": 64000
+  "incidents": [
+    {
+      "incidentName": "Payment timeout",
+      "severity": "high",
+      "currentPhase": "investigating",
+      "assignedTeam": "Payments"
+    },
+    {
+      "incidentName": "Receipt delay",
+      "severity": "medium",
+      "currentPhase": "monitoring",
+      "assignedTeam": "Orders"
     }
+  ],
+  "orders": [
+    { "orderName": "Order 1042", "orderStatus": "shipped", "total": 129.5 },
+    { "orderName": "Order 1043", "orderStatus": "processing", "total": 84.25 }
+  ],
+  "generatedFor": {
+    "purpose": "demonstrate dynamic JSON analysis",
+    "environment": "demo"
   }
-}'></textarea>
+}</textarea>
           <div class="buttons">
             <label class="model-control" for="modelSelect">Model
               <select id="modelSelect">
@@ -811,15 +855,27 @@
 
 
   <script type="module">
-    import {
-      analyze as npmAnalyze,
-      compact as npmCompact,
-      flatten as npmFlatten,
-      prune as npmPrune,
-      estimateTokens as npmEstimateTokens,
-      toNatural as npmToNatural,
-      toTOON as npmToTOON,
-    } from "https://esm.sh/@sohqureshi/tokenwise@1.0.10";
+    const packageMetadataURL = "https://registry.npmjs.org/@sohqureshi%2Ftokenwise";
+    const packageMetadata = await fetch(packageMetadataURL).then((response) => {
+      if (!response.ok) throw new Error(`npm metadata request failed (${response.status})`);
+      return response.json();
+    });
+    const libraryVersion = packageMetadata?.["dist-tags"]?.latest;
+    if (typeof libraryVersion !== "string" || !libraryVersion) {
+      throw new Error("npm latest version was not found");
+    }
+
+    document.getElementById("libraryVersion").textContent = `TokenWise npm: v${libraryVersion}`;
+
+    const {
+      analyze: npmAnalyze,
+      compact: npmCompact,
+      flatten: npmFlatten,
+      prune: npmPrune,
+      estimateTokens: npmEstimateTokens,
+      toNatural: npmToNatural,
+      toTOON: npmToTOON,
+    } = await import(`https://cdn.jsdelivr.net/npm/@sohqureshi/tokenwise@${libraryVersion}/dist/index.js`);
 
     // Lightweight JSON validation helpers used by the demo UI.
     function isValidJSON(str) {
@@ -1016,6 +1072,7 @@
       if (!json) return;
 
       try {
+        // All transformations intentionally share this parsed editor value.
         const inputText = JSON.stringify(json, null, 2);
         const selectedModelEl = document.getElementById('modelSelect');
         const model = selectedModelEl ? selectedModelEl.value : 'gpt-4';
@@ -1132,38 +1189,10 @@
       });
     }
 
+    const initialExampleJSON = document.getElementById('jsonInput').value;
+
     function loadExample() {
-      const example = {
-        workspace: {
-          displayName: 'Apollo Checkout',
-          status: 'active',
-          ownerName: 'Platform Team',
-          region: 'eu-west-1'
-        },
-        incidents: [
-          {
-            incidentName: 'Payment timeout',
-            severity: 'high',
-            currentPhase: 'investigating',
-            assignedTeam: 'Payments'
-          },
-          {
-            incidentName: 'Receipt delay',
-            severity: 'medium',
-            currentPhase: 'monitoring',
-            assignedTeam: 'Orders'
-          }
-        ],
-        orders: [
-          { orderName: 'Order 1042', orderStatus: 'shipped', total: 129.5 },
-          { orderName: 'Order 1043', orderStatus: 'processing', total: 84.25 }
-        ],
-        generatedFor: {
-          purpose: 'demonstrate dynamic JSON analysis',
-          environment: 'demo'
-        }
-      };
-      document.getElementById('jsonInput').value = JSON.stringify(example, null, 2);
+      document.getElementById('jsonInput').value = initialExampleJSON;
       processAndDisplay();
     }
 
