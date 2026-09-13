@@ -241,6 +241,7 @@ used by `tiktoken`.
 - Preserve sibling entities when formatting wrapped JSON objects.
 - Replace the demo's noisy sample with a meaningful dynamic workspace, incident, and order example.
 - Update the browser demo to use the v1.0.11 CDN package.
+- Resolve the demo's npm library version from the `latest` distribution tag and show it in the demo header.
 
 ### v1.0.10 — 2026-09-13
 
