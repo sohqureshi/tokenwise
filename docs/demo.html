@@ -662,6 +662,7 @@
       compact as npmCompact,
       flatten as npmFlatten,
       prune as npmPrune,
+      estimateTokens as npmEstimateTokens,
       toNatural as npmToNatural,
       toTOON as npmToTOON,
     } from "https://esm.sh/@sohqureshi/tokenwise@1.0.9";
@@ -761,26 +762,43 @@
       `;
     }
 
-    function formatCharSummary(originalValue, transformedValue, label) {
+    function formatTokenSummary(originalValue, transformedValue, label, model) {
       const originalChars = typeof originalValue === 'string'
         ? originalValue.length
         : JSON.stringify(originalValue).length;
       const transformedChars = typeof transformedValue === 'string'
         ? transformedValue.length
         : JSON.stringify(transformedValue).length;
-      const savings = Math.max(0, originalChars - transformedChars);
-      const savingsPercent = originalChars > 0 ? Math.round((savings / originalChars) * 100) : 0;
-      const reductionLabel = savingsPercent > 0 ? `Reduced by ${savingsPercent}%` : 'No reduction detected';
-      const highlightClass = savingsPercent > 0 ? '' : 'negative';
+      const tokenOptions = { exact: true, model, fallbackToHeuristic: true };
+      const originalTokens = npmEstimateTokens(originalValue, tokenOptions);
+      const transformedTokens = npmEstimateTokens(transformedValue, tokenOptions);
+      const tokenDelta = transformedTokens - originalTokens;
+      const characterDelta = transformedChars - originalChars;
+      const tokenPercent = originalTokens > 0
+        ? Math.round((Math.abs(tokenDelta) / originalTokens) * 100)
+        : 0;
+      const reductionLabel = tokenDelta < 0
+        ? `${label} saves ${Math.abs(tokenDelta)} tokens (${tokenPercent}%)`
+        : tokenDelta > 0
+          ? `${label} adds ${tokenDelta} tokens (${tokenPercent}%)`
+          : `${label} keeps the same token count`;
+      const highlightClass = tokenDelta > 0 ? 'negative' : '';
+      const interpretation = tokenDelta < 0
+        ? 'This version is cheaper to send to the selected model.'
+        : tokenDelta > 0
+          ? 'This version is larger for the selected model; use it for readability or structure, not token savings.'
+          : 'This transformation does not change the estimated token count.';
 
       return `
         <div class="analysis-highlight ${highlightClass}">${reductionLabel}</div>
         <div class="analysis-meta">
           <div class="meta-pill"><strong>Output</strong>${label}</div>
+          <div class="meta-pill"><strong>Tokens</strong>${originalTokens} → ${transformedTokens}</div>
+          <div class="meta-pill"><strong>Token change</strong>${tokenDelta > 0 ? '+' : ''}${tokenDelta}</div>
           <div class="meta-pill"><strong>Characters</strong>${originalChars} → ${transformedChars}</div>
-          <div class="meta-pill"><strong>Savings</strong>${savings} chars</div>
-          <div class="meta-pill"><strong>Size</strong>${savingsPercent}% smaller</div>
+          <div class="meta-pill"><strong>Character change</strong>${characterDelta > 0 ? '+' : ''}${characterDelta}</div>
         </div>
+        <div class="analysis-note"><strong>Interpretation:</strong> ${interpretation}</div>
       `;
     }
 
@@ -822,13 +840,16 @@
         const natural = npmToNatural(json);
         document.getElementById('naturalInput').textContent = inputText;
         document.getElementById('naturalOutput').textContent = natural;
-        document.getElementById('naturalAnalysis').innerHTML = formatCharSummary(json, natural, 'Natural-language transformation');
+        document.getElementById('naturalAnalysis').innerHTML = formatTokenSummary(json, natural, 'Natural-language transformation', model);
 
         // TOON
         const toon = npmToTOON(json);
         document.getElementById('toonInput').textContent = inputText;
         document.getElementById('toonOutput').textContent = toon;
-        document.getElementById('toonAnalysis').innerHTML = formatCharSummary(json, toon, 'TOON transformation');
+        document.getElementById('toonAnalysis').innerHTML = formatAnalysisSummary(
+          npmAnalyze(json, { ...analyzeOpts, toTOON: true }),
+          'TOON conversion'
+        );
 
         clearError();
       } catch (e) {
