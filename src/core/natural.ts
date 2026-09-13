@@ -55,6 +55,17 @@ export function toNatural(data: any, depth: number = 0): string {
  * Builds a contextual story from an object
  */
 function buildContextualStory(obj: any, depth: number = 0): string {
+  const semanticStory = buildSemanticStory(obj);
+  if (semanticStory) return semanticStory;
+
+  const nestedEntity = Object.values(obj).find((value): value is Record<string, any> => {
+    return isPlainObject(value) && buildSemanticStory(value) !== null;
+  });
+  if (nestedEntity) {
+    const nestedStory = buildSemanticStory(nestedEntity);
+    if (nestedStory) return nestedStory;
+  }
+
   // Look for a name in nested objects first (like 'user' or 'profile')
   let name = obj.name || obj.userName || obj.user;
 
@@ -100,6 +111,165 @@ function buildContextualStory(obj: any, depth: number = 0): string {
   }
 
   return story + ".";
+}
+
+/**
+ * Uses the relationships expressed by well-known fields to form concise
+ * sentences. Unknown shapes continue through the generic key-value fallback.
+ */
+function buildSemanticStory(obj: Record<string, any>): string | null {
+  if (typeof obj.holderName === "string" && typeof obj.policyNumber === "string") {
+    const subject = `${obj.holderName} has policy ${obj.policyNumber}`;
+    const details = [
+      typeof obj.planType === "string" ? `a ${obj.planType} plan` : null,
+      typeof obj.premiumAmount === "number" ? `with a premium of ${formatNumber(obj.premiumAmount)}` : null,
+    ].filter((value): value is string => value !== null);
+    const sentences = [`${subject}${details.length ? `, ${details.join(", ")}` : ""}.`];
+
+    if (isPlainObject(obj.claim)) {
+      const claim = describeClaim(obj.claim);
+      if (claim) sentences.push(claim);
+    }
+
+    if (Array.isArray(obj.dependents) && obj.dependents.length > 0) {
+      sentences.push(`${obj.holderName}'s dependents are ${joinNaturalList(obj.dependents.map(String))}.`);
+    }
+
+    return sentences.join(" ");
+  }
+
+  const subject = findSubject(obj);
+  const stateEntry = findSemanticEntry(obj, [
+    "status",
+    "state",
+    "condition",
+    "stage",
+    "role",
+    "type",
+    "category",
+    "classification",
+    "priority",
+    "phase",
+    "mode",
+    "availability",
+    "outcome",
+    "result",
+    "health",
+    "progress",
+    "visibility",
+    "access",
+    "membership",
+    "sentiment",
+    "severity",
+  ]);
+  if (subject && stateEntry && typeof stateEntry[1] === "string") {
+    const details = Object.entries(obj)
+      .filter(([key, value]) => key !== stateEntry[0] && key !== subject.key && shouldDescribeSemantically(key, value))
+      .map(([key, value]) => `${camelToWords(key)} ${formatSemanticValue(value)}`);
+
+    return `${subject.value} is ${stateEntry[1]}${details.length ? ` and has ${details.join(", ")}` : ""}.`;
+  }
+
+  return null;
+}
+
+function findSubject(obj: Record<string, any>): { key: string; value: string } | null {
+  const subjectKeys = [
+    "name",
+    "title",
+    "label",
+    "displayName",
+    "entityName",
+    "fullName",
+    "userName",
+    "username",
+    "personName",
+    "customerName",
+    "clientName",
+    "ownerName",
+    "accountName",
+    "companyName",
+    "organizationName",
+    "teamName",
+    "departmentName",
+    "projectName",
+    "productName",
+    "serviceName",
+    "resourceName",
+    "fileName",
+    "deviceName",
+    "hostName",
+    "applicationName",
+    "appName",
+    "taskName",
+    "eventName",
+    "itemName",
+    "orderName",
+    "patientName",
+    "employeeName",
+  ];
+  const entries = Object.entries(obj);
+
+  // Prefer explicit subject names so a dynamic key cannot override a clearer match.
+  for (const key of subjectKeys) {
+    if (typeof obj[key] === "string" && obj[key].trim()) {
+      return { key, value: obj[key].trim() };
+    }
+  }
+
+  // Support schemas such as patientName or billingContactName without requiring
+  // every possible domain-specific subject key to be listed above.
+  const nameEntry = entries.find(([key, value]) => {
+    return key.toLowerCase().includes("name") &&
+      typeof value === "string" &&
+      value.trim().length > 0;
+  });
+  if (nameEntry) {
+    return { key: nameEntry[0], value: nameEntry[1].trim() };
+  }
+
+  return null;
+}
+
+function findSemanticEntry(obj: Record<string, any>, keys: string[]): [string, any] | null {
+  const entries = Object.entries(obj);
+  const exactEntry = entries.find(([key]) => keys.includes(key));
+  if (exactEntry) return exactEntry;
+
+  return entries.find(([key]) => {
+    const normalizedKey = key.toLowerCase();
+    return keys.some((semanticKey) => normalizedKey.includes(semanticKey.toLowerCase()));
+  }) ?? null;
+}
+
+function shouldDescribeSemantically(key: string, value: unknown): boolean {
+  return (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) && !["id", "timestamp", "createdAt", "updatedAt", "apiKey", "debug"].includes(key);
+}
+
+function formatSemanticValue(value: unknown): string {
+  if (typeof value === "number") return formatNumber(value);
+  if (typeof value === "boolean") return value ? "enabled" : "disabled";
+  return String(value);
+}
+
+function describeClaim(claim: Record<string, any>): string | null {
+  const parts: string[] = [];
+  if (typeof claim.status === "string") parts.push(`The claim is ${claim.status}`);
+  if (typeof claim.requestedAmount === "number") {
+    parts.push(`for ${formatNumber(claim.requestedAmount)}`);
+  }
+  if (typeof claim.claimNumber === "string") {
+    parts.push(`(reference ${claim.claimNumber})`);
+  }
+  return parts.length ? `${parts.join(" ")}.` : null;
+}
+
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat("en-US").format(value);
 }
 
 /**

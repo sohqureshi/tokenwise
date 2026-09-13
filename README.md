@@ -147,8 +147,24 @@ toNatural({
     }
   }
 });
-// policy: holder name Carlos Rivera, policy number HLT-2048, claim: status under review, requested amount 64000.
+// Carlos Rivera has policy HLT-2048. The claim is under review for 64,000.
 ```
+
+`toNatural()` uses semantic templates when the field relationships are
+unambiguous (for example, a policy holder, policy number, and claim). Unknown
+JSON shapes use a conservative key-value fallback so the formatter does not
+invent relationships or facts. For dynamic entity-shaped objects, it can
+recognize common subject fields such as `name`, `title`, `label`, `displayName`,
+`entityName`, `fullName`, `userName`, `customerName`, `ownerName`,
+`accountName`, `companyName`, `organizationName`, `teamName`, `projectName`,
+`productName`, `serviceName`, `resourceName`, `deviceName`, `patientName`,
+`taskName`, and `eventName`. These can be paired with state fields such as
+`status`, `state`, `condition`, `stage`, `role`, `type`, `category`, `priority`,
+`phase`, `mode`, `availability`, `outcome`, `result`, `health`, `progress`,
+`visibility`, `access`, `membership`, `sentiment`, and `severity`.
+Matching is case-insensitive and also supports keys that contain these
+concepts, such as `patientName`, `orderStatus`, `currentPhase`, or
+`incidentSeverity`.
 
 ### `toTOON()`
 
@@ -219,6 +235,12 @@ used by `tiktoken`.
 ---
 
 ## Release Notes
+
+### v1.0.10 — 2026-09-13
+
+- Add conservative contains-based semantic matching for dynamic subject and state keys, including fields such as `patientName`, `orderStatus`, and `incidentSeverity`.
+- Expand `toNatural()` regression coverage for dynamic entities, nested objects, arrays, metadata filtering, and alternate subject fields.
+- Update the browser demo to use the v1.0.10 CDN package.
 
 ### v1.0.8 — 2026-09-06
 
