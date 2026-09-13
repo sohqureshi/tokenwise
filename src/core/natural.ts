@@ -58,12 +58,16 @@ function buildContextualStory(obj: any, depth: number = 0): string {
   const semanticStory = buildSemanticStory(obj);
   if (semanticStory) return semanticStory;
 
-  const nestedEntity = Object.values(obj).find((value): value is Record<string, any> => {
-    return isPlainObject(value) && buildSemanticStory(value) !== null;
-  });
-  if (nestedEntity) {
-    const nestedStory = buildSemanticStory(nestedEntity);
-    if (nestedStory) return nestedStory;
+  const nestedEntries = Object.entries(obj)
+    .filter(([key]) => !["id", "timestamp", "requestId", "apiKey"].includes(key))
+    .map(([, value]) => value)
+    .filter((value) => value !== null);
+  if (nestedEntries.length === 1) {
+    const nestedEntity = nestedEntries[0];
+    if (isPlainObject(nestedEntity)) {
+      const nestedStory = buildSemanticStory(nestedEntity);
+      if (nestedStory) return nestedStory;
+    }
   }
 
   // Look for a name in nested objects first (like 'user' or 'profile')

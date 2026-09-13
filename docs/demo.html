@@ -1134,34 +1134,33 @@
 
     function loadExample() {
       const example = {
-        product: {
-          name: 'Wireless Headphones',
-          price: 79.99,
-          debug: true,
-          internal: {
-            apiKey: 'secret-key',
-            notes: 'remove me'
-          }
+        workspace: {
+          displayName: 'Apollo Checkout',
+          status: 'active',
+          ownerName: 'Platform Team',
+          region: 'eu-west-1'
         },
-        users: [
-          { id: 1, name: 'Ali', createdAt: '2024-01-01', debug: false },
-          { id: 2, name: 'John', createdAt: '2024-01-02', debug: false }
+        incidents: [
+          {
+            incidentName: 'Payment timeout',
+            severity: 'high',
+            currentPhase: 'investigating',
+            assignedTeam: 'Payments'
+          },
+          {
+            incidentName: 'Receipt delay',
+            severity: 'medium',
+            currentPhase: 'monitoring',
+            assignedTeam: 'Orders'
+          }
         ],
-        policy: {
-          holderName: 'Carlos Rivera',
-          policyNumber: 'HLT-2048',
-          createdAt: '2024-01-03',
-          claim: {
-            status: 'under review',
-            requestedAmount: 64000,
-            internal: {
-              reviewer: 'team-a'
-            }
-          }
-        },
-        metadata: {
-          timestamp: '2024-01-03',
-          source: 'demo'
+        orders: [
+          { orderName: 'Order 1042', orderStatus: 'shipped', total: 129.5 },
+          { orderName: 'Order 1043', orderStatus: 'processing', total: 84.25 }
+        ],
+        generatedFor: {
+          purpose: 'demonstrate dynamic JSON analysis',
+          environment: 'demo'
         }
       };
       document.getElementById('jsonInput').value = JSON.stringify(example, null, 2);
