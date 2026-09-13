@@ -66,7 +66,43 @@ describe('toNatural', () => {
     const output = toNatural(input)
 
     expect(output).toBe(
-      "policy: holder name Carlos Rivera, policy number HLT-2048, plan type family health, premium amount 2850, claim: claim number CLM-7781, status under review, requested amount 64000, dependents: Ana Rivera and Luis Rivera."
+      "Carlos Rivera has policy HLT-2048, a family health plan, with a premium of 2,850. The claim is under review for 64,000 (reference CLM-7781). Carlos Rivera's dependents are Ana Rivera and Luis Rivera."
+    )
+  })
+
+  it('uses semantic sentences for policy data without inventing facts', () => {
+    const output = toNatural({
+      holderName: "Carlos Rivera",
+      policyNumber: "HLT-2048",
+      claim: { status: "approved", requestedAmount: 64000 }
+    })
+
+    expect(output).toBe(
+      "Carlos Rivera has policy HLT-2048. The claim is approved for 64,000."
+    )
+  })
+
+  it('uses safe semantic phrasing for an unrelated dynamic object', () => {
+    const output = toNatural({
+      name: "Order 1042",
+      status: "shipped",
+      total: 129.5,
+      debug: true
+    })
+
+    expect(output).toBe("Order 1042 is shipped and has total 129.5.")
+  })
+
+  it('recognizes common state fields in dynamic entity data', () => {
+    const output = toNatural({
+      title: "Incident 42",
+      severity: "high",
+      priority: "urgent",
+      owner: "Platform"
+    })
+
+    expect(output).toBe(
+      "Incident 42 is high and has priority urgent, owner Platform."
     )
   })
 

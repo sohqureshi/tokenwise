@@ -147,8 +147,18 @@ toNatural({
     }
   }
 });
-// policy: holder name Carlos Rivera, policy number HLT-2048, claim: status under review, requested amount 64000.
+// Carlos Rivera has policy HLT-2048. The claim is under review for 64,000.
 ```
+
+`toNatural()` uses semantic templates when the field relationships are
+unambiguous (for example, a policy holder, policy number, and claim). Unknown
+JSON shapes use a conservative key-value fallback so the formatter does not
+invent relationships or facts. For dynamic entity-shaped objects, it can
+recognize common state fields such as `status`, `state`, `condition`, `stage`,
+`role`, `type`, `category`, `priority`, `phase`, `mode`, `availability`,
+`outcome`, `result`, `health`, `progress`, `visibility`, `access`, `membership`,
+`sentiment`, and `severity` when paired with a subject field such as `name`,
+`title`, `label`, or `customerName`.
 
 ### `toTOON()`
 
