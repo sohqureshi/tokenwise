@@ -898,10 +898,10 @@
           : `${transformation} keeps the same token count`;
       const highlightClass = tokenDelta > 0 ? 'negative' : '';
       const interpretation = tokenDelta < 0
-        ? `This version is cheaper to send to the selected model.`
+        ? `${transformation} is a good fit for this input because it reduces the estimated prompt size.`
         : tokenDelta > 0
-          ? `This version is larger for the selected model; use it for readability or structure, not token savings.`
-          : `This transformation does not change the estimated token count.`;
+          ? `${transformation} is not a token-saving choice here; use it only when its structure or readability is more useful.`
+          : `${transformation} does not change the estimated token count for this input.`;
 
       return `
         <div class="analysis-highlight ${highlightClass}">${reductionLabel}</div>
@@ -938,10 +938,10 @@
           : `${label} keeps the same token count`;
       const highlightClass = tokenDelta > 0 ? 'negative' : '';
       const interpretation = tokenDelta < 0
-        ? 'This version is cheaper to send to the selected model.'
+        ? `${label} is a good fit for this input because it reduces the estimated prompt size.`
         : tokenDelta > 0
-          ? 'This version is larger for the selected model; use it for readability or structure, not token savings.'
-          : 'This transformation does not change the estimated token count.';
+          ? `${label} is not a token-saving choice here; use it only when its structure or readability is more useful.`
+          : `${label} does not change the estimated token count for this input.`;
 
       return `
         <div class="analysis-highlight ${highlightClass}">${reductionLabel}</div>
@@ -995,7 +995,7 @@
       const rootType = Array.isArray(value) ? 'Array' : value === null ? 'Null' : typeof value === 'object' ? 'Object' : typeof value;
 
       return `
-        <div class="analysis-highlight">Input inspected — no transformation applied</div>
+        <div class="analysis-highlight">Baseline ready — choose a transformation to compare</div>
         <div class="analysis-meta">
           <div class="meta-pill"><strong>Estimated tokens</strong>${tokenCount}</div>
           <div class="meta-pill"><strong>Characters</strong>${serialized.length}</div>
@@ -1007,7 +1007,7 @@
           <div class="meta-pill"><strong>Array items</strong>${metrics.arrayItems}</div>
           <div class="meta-pill"><strong>Primitive values</strong>${metrics.strings + metrics.numbers + metrics.booleans + metrics.nulls}</div>
         </div>
-        <div class="analysis-note"><strong>How to use this:</strong> Use the other tabs to compare how pruning, compacting, flattening, natural language, or TOON changes this input.</div>
+        <div class="analysis-note"><strong>Next step:</strong> Try Prune for noisy fields, Compact for minimal JSON, TOON for repeated object arrays, Natural for readability, or Flatten for lookup-friendly keys.</div>
       `;
     }
 
