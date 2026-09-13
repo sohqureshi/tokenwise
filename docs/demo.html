@@ -171,6 +171,121 @@
       line-height: 1.45;
     }
 
+    .prune-options {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.45);
+    }
+
+    .prune-options-title {
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .prune-options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #cbd5e1;
+      font-size: 0.82rem;
+    }
+
+    .tag-dropdown {
+      position: relative;
+    }
+
+    .tag-dropdown-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 40px;
+      padding: 7px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 7px;
+      background: #1e2937;
+      color: #e2e8f0;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .tag-dropdown-toggle::after {
+      content: "▾";
+      color: #94a3b8;
+    }
+
+    .tag-dropdown-menu {
+      display: none;
+      position: absolute;
+      z-index: 5;
+      width: 100%;
+      max-height: 220px;
+      overflow-y: auto;
+      margin-top: 4px;
+      padding: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 7px;
+      background: #0f172a;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .tag-dropdown.open .tag-dropdown-menu {
+      display: grid;
+      gap: 4px;
+    }
+
+    .tag-dropdown-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 5px;
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .tag-dropdown-option:hover {
+      background: rgba(148, 163, 184, 0.12);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.18);
+      color: #bae6fd;
+      font-size: 0.75rem;
+    }
+
+    .tag-empty {
+      color: #94a3b8;
+      font-size: 0.82rem;
+    }
+
+    .prune-options select {
+      width: 100%;
+      min-height: 112px;
+      padding: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 7px;
+      background: #1e2937;
+      color: #e2e8f0;
+      font: inherit;
+    }
+
     #jsonInput {
       flex: 1;
       background: #1e2937;
@@ -734,10 +849,6 @@
           <div class="info-box">Inspect the input size and structure without transforming the data.</div>
           <div class="result-stack">
             <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="analyzeInput">Enter valid JSON to inspect</div>
-            </div>
-            <div class="result-card">
               <div class="result-label">Input overview</div>
               <div class="analysis-box" id="analyzeAnalysis">Enter valid JSON to inspect</div>
             </div>
@@ -747,12 +858,8 @@
 
         <!-- Compact Tab -->
         <div id="compact" class="tab-content">
-          <div class="info-box">See the input JSON, the compacted result, and the estimated savings.</div>
+          <div class="info-box">See the compacted result and estimated savings for the current JSON.</div>
           <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="compactInput">Enter valid JSON to compact</div>
-            </div>
             <div class="result-card">
               <div class="result-label">After (Compact)</div>
               <div class="output-box" id="compactOutput">Enter valid JSON to compact</div>
@@ -767,12 +874,8 @@
 
         <!-- Flatten Tab -->
         <div id="flatten" class="tab-content">
-          <div class="info-box">Flatten nested objects into a dot-notation view and compare it against the source payload.</div>
+          <div class="info-box">Flatten nested objects into a dot-notation view for the current JSON.</div>
           <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="flattenInput">Enter valid JSON to flatten</div>
-            </div>
             <div class="result-card">
               <div class="result-label">After (Flatten)</div>
               <div class="output-box" id="flattenOutput">Enter valid JSON to flatten</div>
@@ -787,12 +890,27 @@
 
         <!-- Prune Tab -->
         <div id="prune" class="tab-content active">
-          <div class="info-box">Remove noise such as ids, debug fields, and internal metadata before prompting an LLM.</div>
-          <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="pruneInput">Enter valid JSON to prune</div>
+          <div class="info-box">Remove noise such as ids, debug fields, and internal metadata before prompting an LLM. Change these options, then apply the current JSON to compare the result.</div>
+          <div class="prune-options">
+            <div class="prune-options-title">Prune options</div>
+            <label for="pruneRemoveKeys">Fields to remove</label>
+            <div class="tag-dropdown" id="pruneRemoveKeys">
+              <button class="tag-dropdown-toggle" type="button" aria-expanded="false">
+                <span class="tag-list" data-tags></span>
+              </button>
+              <div class="tag-dropdown-menu" data-options></div>
             </div>
+            <div class="input-help">Keys are detected from the current JSON. Technical keys are recommended automatically.</div>
+            <label for="pruneRules">Cleanup rules</label>
+            <div class="tag-dropdown" id="pruneRules">
+              <button class="tag-dropdown-toggle" type="button" aria-expanded="false">
+                <span class="tag-list" data-tags></span>
+              </button>
+              <div class="tag-dropdown-menu" data-options></div>
+            </div>
+            <div class="input-help">Select one or more rules; changes update Prune immediately.</div>
+          </div>
+          <div class="result-stack">
             <div class="result-card">
               <div class="result-label">After (Prune)</div>
               <div class="output-box" id="pruneOutput">Enter valid JSON to prune</div>
@@ -807,12 +925,8 @@
 
         <!-- Natural Tab -->
         <div id="natural" class="tab-content">
-          <div class="info-box">Convert your JSON into natural-language context and compare the length of the original payload with the rewritten version.</div>
+          <div class="info-box">Convert the current JSON into natural-language context and compare the result size.</div>
           <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="naturalInput">Enter valid JSON to convert</div>
-            </div>
             <div class="result-card">
               <div class="result-label">After (Natural)</div>
               <div class="output-box" id="naturalOutput">Enter valid JSON to convert</div>
@@ -829,10 +943,6 @@
         <div id="toon" class="tab-content">
           <div class="info-box">Turn object arrays into a compact TOON-style layout and inspect how much structure it preserves.</div>
           <div class="result-stack">
-            <div class="result-card">
-              <div class="result-label">Input JSON</div>
-              <div class="output-box" id="toonInput">Enter valid JSON to convert</div>
-            </div>
             <div class="result-card">
               <div class="result-label">After (TOON)</div>
               <div class="output-box" id="toonOutput">Enter valid JSON to convert</div>
@@ -1067,49 +1177,167 @@
       `;
     }
 
+    const recommendedPruneKeys = new Set([
+      'id',
+      'debug',
+      'internal',
+      'metadata',
+      'apiKey',
+      'timestamp',
+      'createdAt',
+      'updatedAt'
+    ]);
+    const pruneRuleLabels = {
+      removeNull: 'Remove null values',
+      removeUndefined: 'Remove undefined values',
+      removeEmptyObjects: 'Remove empty objects',
+      removeEmptyArrays: 'Remove empty arrays'
+    };
+    const pruneState = {
+      removeKeys: new Set(),
+      rules: new Set(['removeNull', 'removeUndefined', 'removeEmptyObjects']),
+      keysInitialized: false
+    };
+
+    function collectObjectKeys(value, keys = new Set()) {
+      if (Array.isArray(value)) {
+        value.forEach((item) => collectObjectKeys(item, keys));
+      } else if (value && typeof value === 'object') {
+        Object.entries(value).forEach(([key, child]) => {
+          keys.add(key);
+          collectObjectKeys(child, keys);
+        });
+      }
+      return keys;
+    }
+
+    function refreshPruneKeyOptions(value) {
+      const keys = Array.from(collectObjectKeys(value)).sort((a, b) => a.localeCompare(b));
+      const availableKeys = new Set(keys);
+      if (!pruneState.keysInitialized) {
+        keys.filter((key) => recommendedPruneKeys.has(key))
+          .forEach((key) => pruneState.removeKeys.add(key));
+        pruneState.keysInitialized = true;
+      } else {
+        pruneState.removeKeys.forEach((key) => {
+          if (!availableKeys.has(key)) pruneState.removeKeys.delete(key);
+        });
+      }
+      renderTagDropdown(
+        'pruneRemoveKeys',
+        keys,
+        pruneState.removeKeys,
+        (key, selected) => {
+          if (selected) pruneState.removeKeys.add(key);
+          else pruneState.removeKeys.delete(key);
+          processAndDisplay();
+        },
+        (key) => recommendedPruneKeys.has(key) ? `${key} (recommended)` : key
+      );
+    }
+
+    function renderTagDropdown(id, options, selected, onChange, getLabel = (option) => option) {
+      const dropdown = document.getElementById(id);
+      const tags = dropdown.querySelector('[data-tags]');
+      const menu = dropdown.querySelector('[data-options]');
+      tags.replaceChildren();
+      const selectedOptions = options.filter((option) => selected.has(option));
+      if (selectedOptions.length === 0) {
+        const empty = document.createElement('span');
+        empty.className = 'tag-empty';
+        empty.textContent = 'None selected';
+        tags.appendChild(empty);
+      } else {
+        selectedOptions.forEach((option) => {
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.textContent = getLabel(option);
+          tags.appendChild(tag);
+        });
+      }
+      menu.replaceChildren(...options.map((option) => {
+        const label = document.createElement('label');
+        label.className = 'tag-dropdown-option';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = selected.has(option);
+        checkbox.addEventListener('change', () => onChange(option, checkbox.checked));
+        label.append(checkbox, document.createTextNode(getLabel(option)));
+        return label;
+      }));
+    }
+
+    function renderPruneRules() {
+      renderTagDropdown(
+        'pruneRules',
+        Object.keys(pruneRuleLabels),
+        pruneState.rules,
+        (rule, selected) => {
+          if (selected) pruneState.rules.add(rule);
+          else pruneState.rules.delete(rule);
+          processAndDisplay();
+        },
+        (rule) => pruneRuleLabels[rule]
+      );
+    }
+
+    function initializeTagDropdowns() {
+      document.querySelectorAll('.tag-dropdown-toggle').forEach((button) => {
+        button.addEventListener('click', () => {
+          const dropdown = button.parentElement;
+          const open = dropdown.classList.toggle('open');
+          button.setAttribute('aria-expanded', String(open));
+        });
+      });
+      renderPruneRules();
+    }
+
     function processAndDisplay() {
       const json = getInputJSON();
       if (!json) return;
 
       try {
         // All transformations intentionally share this parsed editor value.
+        refreshPruneKeyOptions(json);
+        renderPruneRules();
         const inputText = JSON.stringify(json, null, 2);
         const selectedModelEl = document.getElementById('modelSelect');
         const model = selectedModelEl ? selectedModelEl.value : 'gpt-4';
         const analyzeOpts = { exact: true, model, fallbackToHeuristic: true };
 
         // Inspect input without applying an optimization.
-        document.getElementById('analyzeInput').textContent = inputText;
         document.getElementById('analyzeAnalysis').innerHTML = formatInputOverview(json, model);
 
         // Compact
         const compacted = npmCompact(json);
         const compactedText = typeof compacted === 'string' ? compacted : JSON.stringify(compacted, null, 2);
-        document.getElementById('compactInput').textContent = inputText;
         document.getElementById('compactOutput').textContent = compactedText;
         document.getElementById('compactAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, compact: true }), 'Compacting');
 
         // Flatten
         const flattened = npmFlatten(json);
-        document.getElementById('flattenInput').textContent = inputText;
         document.getElementById('flattenOutput').textContent = JSON.stringify(flattened, null, 2);
         document.getElementById('flattenAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, flatten: true }), 'Flattening');
 
         // Prune
-        const pruned = npmPrune(json, { removeKeys: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] });
-        document.getElementById('pruneInput').textContent = inputText;
+        const pruneOptions = {
+          removeKeys: Array.from(pruneState.removeKeys),
+          removeNull: pruneState.rules.has('removeNull'),
+          removeUndefined: pruneState.rules.has('removeUndefined'),
+          removeEmptyObjects: pruneState.rules.has('removeEmptyObjects'),
+          removeEmptyArrays: pruneState.rules.has('removeEmptyArrays'),
+        };
+        const pruned = npmPrune(json, pruneOptions);
         document.getElementById('pruneOutput').textContent = JSON.stringify(pruned, null, 2);
-        document.getElementById('pruneAnalysis').innerHTML = formatAnalysisSummary(npmAnalyze(json, { ...analyzeOpts, prune: ['id', 'debug', 'internal', 'createdAt', 'updatedAt'] }), 'Pruning');
+        document.getElementById('pruneAnalysis').innerHTML = formatTokenSummary(json, pruned, 'Pruning');
 
         // Natural Language
         const natural = npmToNatural(json);
-        document.getElementById('naturalInput').textContent = inputText;
         document.getElementById('naturalOutput').textContent = natural;
         document.getElementById('naturalAnalysis').innerHTML = formatTokenSummary(json, natural, 'Natural-language transformation', model);
 
         // TOON
         const toon = npmToTOON(json);
-        document.getElementById('toonInput').textContent = inputText;
         document.getElementById('toonOutput').textContent = toon;
         document.getElementById('toonAnalysis').innerHTML = formatAnalysisSummary(
           npmAnalyze(json, { ...analyzeOpts, toTOON: true }),
@@ -1219,16 +1447,18 @@
 
     // ========== EVENT LISTENERS ==========
 
+    initializeTagDropdowns();
     const input = document.getElementById('jsonInput');
     input.addEventListener('input', processAndDisplay);
     input.addEventListener('change', processAndDisplay);
     document.getElementById('modelSelect').addEventListener('change', processAndDisplay);
-
-    // Process the starter JSON and activate the URL-driven tab on page load
-    window.addEventListener('load', () => {
-      processAndDisplay();
-      showTab(resolveTabFromURL(), null, { updateURL: false });
+    document.querySelectorAll('#prune input').forEach((control) => {
+      control.addEventListener('change', processAndDisplay);
     });
+
+    // Render the prefilled JSON immediately; async module loading may finish
+    // after the window load event has already fired.
+    showTab(resolveTabFromURL(), null, { updateURL: false });
   </script>
 
 </body>
